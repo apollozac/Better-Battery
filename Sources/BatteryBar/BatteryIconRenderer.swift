@@ -5,7 +5,6 @@ enum BatteryIconRenderer {
 
     static func image(percentage: Int, isConnectedToPower: Bool) -> NSImage {
         let clampedPercentage = min(max(percentage, 0), 100)
-        let fraction = Double(clampedPercentage) / 100
         let showsPowerBolt = Self.showsPowerBolt(
             isConnectedToPower: isConnectedToPower
         )
@@ -14,8 +13,10 @@ enum BatteryIconRenderer {
             : "\(clampedPercentage)% battery"
 
         if let image = NSImage(
-            systemSymbolName: symbolName(showsPowerBolt: showsPowerBolt),
-            variableValue: fraction,
+            systemSymbolName: symbolName(
+                percentage: clampedPercentage,
+                showsPowerBolt: showsPowerBolt
+            ),
             accessibilityDescription: description
         )?.withSymbolConfiguration(
             NSImage.SymbolConfiguration(pointSize: symbolPointSize, weight: .regular)
@@ -27,8 +28,27 @@ enum BatteryIconRenderer {
         return fallbackImage(percentage: clampedPercentage)
     }
 
-    static func symbolName(showsPowerBolt: Bool) -> String {
-        showsPowerBolt ? "battery.100percent.bolt" : "battery.100percent"
+    static func symbolName(
+        percentage: Int,
+        showsPowerBolt: Bool
+    ) -> String {
+        if showsPowerBolt {
+            return "battery.100percent.bolt"
+        }
+
+        let clampedPercentage = min(max(percentage, 0), 100)
+        switch clampedPercentage {
+        case 88...:
+            return "battery.100percent"
+        case 63...:
+            return "battery.75percent"
+        case 38...:
+            return "battery.50percent"
+        case 13...:
+            return "battery.25percent"
+        default:
+            return "battery.0percent"
+        }
     }
 
     static func showsPowerBolt(isConnectedToPower: Bool) -> Bool {

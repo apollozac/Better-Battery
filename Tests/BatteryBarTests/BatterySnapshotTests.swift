@@ -100,11 +100,45 @@ final class BatterySnapshotTests: XCTestCase {
             "A full battery still needs to indicate that external power is connected"
         )
         XCTAssertEqual(
-            BatteryIconRenderer.symbolName(showsPowerBolt: true),
+            BatteryIconRenderer.symbolName(
+                percentage: 38,
+                showsPowerBolt: true
+            ),
             "battery.100percent.bolt"
         )
         XCTAssertEqual(
-            BatteryIconRenderer.symbolName(showsPowerBolt: false),
+            BatteryIconRenderer.symbolName(
+                percentage: 12,
+                showsPowerBolt: false
+            ),
+            "battery.0percent"
+        )
+        XCTAssertEqual(
+            BatteryIconRenderer.symbolName(
+                percentage: 13,
+                showsPowerBolt: false
+            ),
+            "battery.25percent"
+        )
+        XCTAssertEqual(
+            BatteryIconRenderer.symbolName(
+                percentage: 38,
+                showsPowerBolt: false
+            ),
+            "battery.50percent"
+        )
+        XCTAssertEqual(
+            BatteryIconRenderer.symbolName(
+                percentage: 63,
+                showsPowerBolt: false
+            ),
+            "battery.75percent"
+        )
+        XCTAssertEqual(
+            BatteryIconRenderer.symbolName(
+                percentage: 88,
+                showsPowerBolt: false
+            ),
             "battery.100percent"
         )
     }

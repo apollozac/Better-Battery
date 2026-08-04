@@ -2,8 +2,8 @@
 
 A deliberately conventional macOS menu bar battery indicator:
 
-- a variable-fill SF Symbols battery icon and percentage by default, with a
-  bolt whenever external power is connected;
+- a percentage-matched SF Symbols battery icon and percentage by default, with
+  a bolt whenever external power is connected;
 - an optional compact percentage-only display designed to sit beside Apple's
   battery item;
 - a native General settings pane for display mode and Open at Login;
