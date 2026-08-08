@@ -2,6 +2,8 @@ import AppKit
 
 enum BatteryIconRenderer {
     static let symbolPointSize: CGFloat = 18
+    static let chargingImageSize = NSSize(width: 31, height: 15)
+    private static let chargingFillMaximumWidth: CGFloat = 18
 
     static func image(percentage: Int, isConnectedToPower: Bool) -> NSImage {
         let clampedPercentage = min(max(percentage, 0), 100)
@@ -12,11 +14,15 @@ enum BatteryIconRenderer {
             ? "\(clampedPercentage)% battery, connected to power"
             : "\(clampedPercentage)% battery"
 
-        if let image = NSImage(
-            systemSymbolName: symbolName(
+        if showsPowerBolt {
+            return chargingImage(
                 percentage: clampedPercentage,
-                showsPowerBolt: showsPowerBolt
-            ),
+                accessibilityDescription: description
+            )
+        }
+
+        if let image = NSImage(
+            systemSymbolName: symbolName(percentage: clampedPercentage),
             accessibilityDescription: description
         )?.withSymbolConfiguration(
             NSImage.SymbolConfiguration(pointSize: symbolPointSize, weight: .regular)
@@ -29,13 +35,8 @@ enum BatteryIconRenderer {
     }
 
     static func symbolName(
-        percentage: Int,
-        showsPowerBolt: Bool
+        percentage: Int
     ) -> String {
-        if showsPowerBolt {
-            return "battery.100percent.bolt"
-        }
-
         let clampedPercentage = min(max(percentage, 0), 100)
         switch clampedPercentage {
         case 88...:
@@ -53,6 +54,76 @@ enum BatteryIconRenderer {
 
     static func showsPowerBolt(isConnectedToPower: Bool) -> Bool {
         isConnectedToPower
+    }
+
+    static func chargingFillWidth(percentage: Int) -> CGFloat {
+        let clampedPercentage = min(max(percentage, 0), 100)
+        return chargingFillMaximumWidth * CGFloat(clampedPercentage) / 100
+    }
+
+    private static func chargingImage(
+        percentage: Int,
+        accessibilityDescription: String
+    ) -> NSImage {
+        let image = NSImage(size: chargingImageSize, flipped: false) { _ in
+            let bodyRect = NSRect(x: 2.25, y: 2.25, width: 22, height: 10.5)
+            let bodyPath = NSBezierPath(
+                roundedRect: bodyRect,
+                xRadius: 2.7,
+                yRadius: 2.7
+            )
+            bodyPath.lineWidth = 1.5
+
+            NSColor.black.setStroke()
+            bodyPath.stroke()
+
+            let terminalPath = NSBezierPath(
+                roundedRect: NSRect(x: 25.5, y: 5.5, width: 2.1, height: 4),
+                xRadius: 1,
+                yRadius: 1
+            )
+            NSColor.black.setFill()
+            terminalPath.fill()
+
+            let fillWidth = chargingFillWidth(percentage: percentage)
+            if fillWidth > 0 {
+                let fillPath = NSBezierPath(
+                    roundedRect: NSRect(x: 4.25, y: 4.25, width: fillWidth, height: 6.5),
+                    xRadius: min(1.5, fillWidth / 2),
+                    yRadius: 1.5
+                )
+                fillPath.fill()
+            }
+
+            drawChargingBolt()
+
+            return true
+        }
+
+        image.isTemplate = true
+        image.accessibilityDescription = accessibilityDescription
+        return image
+    }
+
+    private static func drawChargingBolt() {
+        let boltPath = NSBezierPath()
+        boltPath.move(to: NSPoint(x: 14.9, y: 14.25))
+        boltPath.line(to: NSPoint(x: 9.7, y: 7.9))
+        boltPath.line(to: NSPoint(x: 13, y: 7.9))
+        boltPath.line(to: NSPoint(x: 11.5, y: 0.75))
+        boltPath.line(to: NSPoint(x: 17.5, y: 8.55))
+        boltPath.line(to: NSPoint(x: 14.15, y: 8.55))
+        boltPath.close()
+        boltPath.lineJoinStyle = .round
+
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current?.compositingOperation = .clear
+        boltPath.lineWidth = 2.75
+        boltPath.stroke()
+        NSGraphicsContext.restoreGraphicsState()
+
+        NSColor.black.setFill()
+        boltPath.fill()
     }
 
     private static func fallbackImage(percentage: Int) -> NSImage {

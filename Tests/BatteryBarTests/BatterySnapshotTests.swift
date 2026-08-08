@@ -100,47 +100,30 @@ final class BatterySnapshotTests: XCTestCase {
             "A full battery still needs to indicate that external power is connected"
         )
         XCTAssertEqual(
-            BatteryIconRenderer.symbolName(
-                percentage: 38,
-                showsPowerBolt: true
-            ),
-            "battery.100percent.bolt"
-        )
-        XCTAssertEqual(
-            BatteryIconRenderer.symbolName(
-                percentage: 12,
-                showsPowerBolt: false
-            ),
+            BatteryIconRenderer.symbolName(percentage: 12),
             "battery.0percent"
         )
         XCTAssertEqual(
-            BatteryIconRenderer.symbolName(
-                percentage: 13,
-                showsPowerBolt: false
-            ),
+            BatteryIconRenderer.symbolName(percentage: 13),
             "battery.25percent"
         )
         XCTAssertEqual(
-            BatteryIconRenderer.symbolName(
-                percentage: 38,
-                showsPowerBolt: false
-            ),
+            BatteryIconRenderer.symbolName(percentage: 38),
             "battery.50percent"
         )
         XCTAssertEqual(
-            BatteryIconRenderer.symbolName(
-                percentage: 63,
-                showsPowerBolt: false
-            ),
+            BatteryIconRenderer.symbolName(percentage: 63),
             "battery.75percent"
         )
         XCTAssertEqual(
-            BatteryIconRenderer.symbolName(
-                percentage: 88,
-                showsPowerBolt: false
-            ),
+            BatteryIconRenderer.symbolName(percentage: 88),
             "battery.100percent"
         )
+        XCTAssertEqual(BatteryIconRenderer.chargingImageSize, NSSize(width: 31, height: 15))
+        XCTAssertEqual(BatteryIconRenderer.chargingFillWidth(percentage: -1), 0)
+        XCTAssertEqual(BatteryIconRenderer.chargingFillWidth(percentage: 34), 6.12, accuracy: 0.001)
+        XCTAssertEqual(BatteryIconRenderer.chargingFillWidth(percentage: 64), 11.52, accuracy: 0.001)
+        XCTAssertEqual(BatteryIconRenderer.chargingFillWidth(percentage: 101), 18)
     }
 
     func testBatteryHealthParserUsesSystemProfilerValues() {
