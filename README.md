@@ -1,48 +1,68 @@
 # Better Battery
 
-A deliberately conventional macOS menu bar battery indicator:
+Better Battery is a tiny, free menu bar utility for macOS 27 Golden Gate.
 
-- a percentage-matched SF Symbols battery icon and percentage by default, with
-  a bolt whenever external power is connected;
-- an optional compact percentage-only display designed to sit beside Apple's
-  battery item;
-- a native General settings pane for display mode and Open at Login;
-- a dedicated Battery Health settings pane;
-- clock-matching 13-point SF Pro numerals with stable tabular spacing;
-- system-matching power-source language plus charging detail in the tooltip;
-- cached battery health, maximum capacity, and cycle count;
-- state-appropriate charging and remaining-time estimates;
-- immediate refresh after wake plus a public system time-estimate fallback;
-- an Icon Composer app icon with current and fallback macOS resources;
-- no Dock icon and no account, analytics, or network access.
+Golden Gate gives the system battery indicator a clean, iOS-inspired design,
+but putting the percentage inside the battery makes it harder to read at a
+glance. Better Battery restores that legibility without trying to become a
+battery-management suite.
 
-Better Battery updates from macOS power-source change notifications. Its safety
-refresh runs every five minutes while battery state is active and every 15
-minutes when fully charged on power. Recent readings are reused when the menu is
-reopened within five seconds. Battery health is queried only when its Settings
-pane is opened and remains cached for an hour, even after the Settings window is
-released.
+## Download
 
-## Build and run
+[Download the latest version of Better Battery](https://github.com/apollozac/Better-Battery/releases/latest/download/Better-Battery.zip)
+
+Better Battery requires macOS 27 or later. Unzip the download, move
+**Better Battery.app** to Applications, and open it. The downloadable build is
+signed and notarized by Apple.
+
+## What it does
+
+- Shows a percentage-matched battery icon with the percentage beside it.
+- Shows charging and external-power states.
+- Offers a percentage-only mode designed to sit beside Apple's battery icon.
+- Displays battery condition, maximum capacity, and cycle count in Settings.
+- Can open automatically when you log in.
+- Uses native macOS power notifications with a low-frequency safety refresh.
+- Includes no accounts, analytics, advertising, or network access.
+
+That is intentionally the whole app: no charge limits, automation, or
+background dashboards.
+
+## Energy use
+
+Better Battery is designed to use effectively negligible resources. In a
+three-hour measurement covering charging, full charge, unplugging, and battery
+use, it consumed 1.88 seconds of CPU time—about 0.017% of one CPU core on
+average. Sampled power impact remained at 0.0 throughout.
+
+## Build from source
+
+Better Battery is a Swift Package and builds against the macOS 27 SDK.
 
 ```sh
 ./script/build_and_run.sh
 ```
 
-The Run action in Codex uses the same script. The app requires macOS 27 or later
-and builds against the macOS 27 SDK.
-
-To build the release app ZIP in `outputs/`:
+Run the tests with:
 
 ```sh
-./script/package_release.sh
+swift test --disable-sandbox
 ```
 
-Release packages use the locally installed Developer ID identity by default.
-Set `BETTER_BATTERY_SIGN_IDENTITY` to override the signing identity.
+Maintainers can create a signed and notarized release ZIP with:
 
-The scripts use a project-local compiler cache and disable SwiftPM's nested
-sandbox so they also work from inside Codex's managed workspace.
+```sh
+BETTER_BATTERY_NOTARY_PROFILE="your-notarytool-profile" ./script/package_release.sh
+```
 
-After launching Better Battery, you can hide Apple's battery item in System
-Settings so only this replacement remains visible.
+## Privacy
+
+Better Battery reads battery and power-source information supplied locally by
+macOS. It does not collect, transmit, or sell data, and it contains no analytics
+or advertising frameworks.
+
+## License
+
+Better Battery is available under the [MIT License](LICENSE).
+
+Better Battery is an independent app and is not affiliated with Apple Inc.
