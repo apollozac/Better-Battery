@@ -40,7 +40,7 @@ final class SettingsWindowController:
     NSWindowDelegate,
     NSToolbarDelegate
 {
-    private static let contentSize = NSSize(width: 560, height: 270)
+    private static let contentSize = NSSize(width: 560, height: 320)
     static let batteryCycleSupportURL = URL(
         string: "https://support.apple.com/en-us/102888"
     )!
@@ -58,6 +58,14 @@ final class SettingsWindowController:
         checkboxWithTitle: "Open at Login",
         target: nil,
         action: nil
+    )
+    private let chargingIconStylePopUp = NSPopUpButton(
+        frame: .zero,
+        pullsDown: false
+    )
+    private let percentagePositionPopUp = NSPopUpButton(
+        frame: .zero,
+        pullsDown: false
     )
     private let loginDetailLabel = SettingsWindowController.makeDetailLabel("")
     private let conditionValueLabel = SettingsWindowController.makeValueLabel()
@@ -100,6 +108,16 @@ final class SettingsWindowController:
 
         percentageOnlyCheckbox.target = self
         percentageOnlyCheckbox.action = #selector(togglePercentageOnly)
+        chargingIconStylePopUp.addItems(
+            withTitles: ChargingIconStyle.allCases.map(\.title)
+        )
+        chargingIconStylePopUp.target = self
+        chargingIconStylePopUp.action = #selector(changeChargingIconStyle)
+        percentagePositionPopUp.addItems(
+            withTitles: PercentagePosition.allCases.map(\.title)
+        )
+        percentagePositionPopUp.target = self
+        percentagePositionPopUp.action = #selector(changePercentagePosition)
         openAtLoginCheckbox.target = self
         openAtLoginCheckbox.action = #selector(toggleOpenAtLogin)
 
@@ -150,12 +168,51 @@ final class SettingsWindowController:
             control: percentageOnlyCheckbox,
             detail: percentageDetail
         )
+        let chargingIconLabel = NSTextField(labelWithString: "Charging Icon")
+        chargingIconLabel.font = .systemFont(ofSize: 14)
+        let chargingIconControl = NSStackView(
+            views: [chargingIconLabel, chargingIconStylePopUp]
+        )
+        chargingIconControl.orientation = .horizontal
+        chargingIconControl.alignment = .centerY
+        chargingIconControl.spacing = 10
+        let chargingIconDetail = Self.makeDetailLabel(
+            "Choose how the battery icon appears while connected to power."
+        )
+        let chargingIconStack = Self.makeControlStack(
+            control: chargingIconControl,
+            detail: chargingIconDetail
+        )
+        let percentagePositionLabel = NSTextField(
+            labelWithString: "Percentage Position"
+        )
+        percentagePositionLabel.font = .systemFont(ofSize: 14)
+        let percentagePositionControl = NSStackView(
+            views: [percentagePositionLabel, percentagePositionPopUp]
+        )
+        percentagePositionControl.orientation = .horizontal
+        percentagePositionControl.alignment = .centerY
+        percentagePositionControl.spacing = 10
+        let percentagePositionDetail = Self.makeDetailLabel(
+            "Choose which side of the battery icon displays the percentage."
+        )
+        let percentagePositionStack = Self.makeControlStack(
+            control: percentagePositionControl,
+            detail: percentagePositionDetail
+        )
         let loginStack = Self.makeControlStack(
             control: openAtLoginCheckbox,
             detail: loginDetailLabel
         )
 
-        let stack = NSStackView(views: [percentageStack, loginStack])
+        let stack = NSStackView(
+            views: [
+                percentageStack,
+                chargingIconStack,
+                percentagePositionStack,
+                loginStack
+            ]
+        )
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.orientation = .vertical
         stack.alignment = .leading
@@ -232,6 +289,16 @@ final class SettingsWindowController:
     private func refreshGeneralControls() {
         percentageOnlyCheckbox.state =
             AppPreferences.showsPercentageOnly ? .on : .off
+        chargingIconStylePopUp.selectItem(
+            at: ChargingIconStyle.allCases.firstIndex(
+                of: AppPreferences.chargingIconStyle
+            ) ?? 0
+        )
+        percentagePositionPopUp.selectItem(
+            at: PercentagePosition.allCases.firstIndex(
+                of: AppPreferences.percentagePosition
+            ) ?? 0
+        )
 
         let presentation = loginItemManager.presentation
         switch presentation.indicator {
@@ -260,6 +327,24 @@ final class SettingsWindowController:
 
     @objc private func togglePercentageOnly() {
         AppPreferences.showsPercentageOnly = percentageOnlyCheckbox.state == .on
+    }
+
+    @objc private func changeChargingIconStyle() {
+        let selectedIndex = chargingIconStylePopUp.indexOfSelectedItem
+        guard ChargingIconStyle.allCases.indices.contains(selectedIndex) else {
+            return
+        }
+        AppPreferences.chargingIconStyle =
+            ChargingIconStyle.allCases[selectedIndex]
+    }
+
+    @objc private func changePercentagePosition() {
+        let selectedIndex = percentagePositionPopUp.indexOfSelectedItem
+        guard PercentagePosition.allCases.indices.contains(selectedIndex) else {
+            return
+        }
+        AppPreferences.percentagePosition =
+            PercentagePosition.allCases[selectedIndex]
     }
 
     @objc private func toggleOpenAtLogin() {
@@ -389,7 +474,7 @@ final class SettingsWindowController:
     }
 
     private static func makeControlStack(
-        control: NSButton,
+        control: NSView,
         detail: NSTextField
     ) -> NSStackView {
         let stack = NSStackView(views: [control, detail])

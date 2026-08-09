@@ -20,6 +20,8 @@ private struct StatusPresentation: Equatable {
     let isConnectedToPower: Bool
     let stateDescription: String
     let showsPercentageOnly: Bool
+    let chargingIconStyle: ChargingIconStyle
+    let percentagePosition: PercentagePosition
 }
 
 @MainActor
@@ -244,13 +246,15 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
                     ? nil
                     : BatteryIconRenderer.image(
                         percentage: 0,
-                        isConnectedToPower: false
+                        isConnectedToPower: false,
+                        chargingIconStyle: AppPreferences.chargingIconStyle
                     )
                 statusItem.button?.title = title
                 statusItem.button?.toolTip = "Battery information unavailable"
                 updateStatusItemLayout(
                     for: title,
-                    showsPercentageOnly: showsPercentageOnly
+                    showsPercentageOnly: showsPercentageOnly,
+                    percentagePosition: AppPreferences.percentagePosition
                 )
                 lastStatusPresentation = nil
                 isShowingUnavailableStatus = true
@@ -272,21 +276,25 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
             percentage: snapshot.percentage,
             isConnectedToPower: snapshot.isConnectedToPower,
             stateDescription: snapshot.stateDescription,
-            showsPercentageOnly: AppPreferences.showsPercentageOnly
+            showsPercentageOnly: AppPreferences.showsPercentageOnly,
+            chargingIconStyle: AppPreferences.chargingIconStyle,
+            percentagePosition: AppPreferences.percentagePosition
         )
         if presentation != lastStatusPresentation || isShowingUnavailableStatus {
             statusItem.button?.image = presentation.showsPercentageOnly
                 ? nil
                 : BatteryIconRenderer.image(
                     percentage: presentation.percentage,
-                    isConnectedToPower: presentation.isConnectedToPower
+                    isConnectedToPower: presentation.isConnectedToPower,
+                    chargingIconStyle: presentation.chargingIconStyle
                 )
             statusItem.button?.title = title
             statusItem.button?.toolTip =
                 "\(presentation.percentage)% — \(presentation.stateDescription)"
             updateStatusItemLayout(
                 for: title,
-                showsPercentageOnly: presentation.showsPercentageOnly
+                showsPercentageOnly: presentation.showsPercentageOnly,
+                percentagePosition: presentation.percentagePosition
             )
             lastStatusPresentation = presentation
             isShowingUnavailableStatus = false
@@ -332,7 +340,8 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
 
     private func updateStatusItemLayout(
         for title: String,
-        showsPercentageOnly: Bool
+        showsPercentageOnly: Bool,
+        percentagePosition: PercentagePosition
     ) {
         guard let button = statusItem.button else {
             return
@@ -345,7 +354,9 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
             let textWidth = (title as NSString).size(withAttributes: [.font: font]).width
             statusItem.length = ceil(textWidth) + 2
         } else {
-            button.imagePosition = .imageLeading
+            button.imagePosition = percentagePosition == .rightOfBattery
+                ? .imageLeading
+                : .imageTrailing
             statusItem.length = NSStatusItem.variableLength
         }
     }

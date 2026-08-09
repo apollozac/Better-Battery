@@ -126,6 +126,36 @@ final class BatterySnapshotTests: XCTestCase {
         XCTAssertEqual(BatteryIconRenderer.chargingFillWidth(percentage: 101), 18)
     }
 
+    func testChargingIconStylesHaveStableTitles() {
+        XCTAssertEqual(
+            ChargingIconStyle.allCases,
+            [.percentageFill, .original]
+        )
+        XCTAssertEqual(
+            ChargingIconStyle.percentageFill.title,
+            "Percentage Fill"
+        )
+        XCTAssertEqual(
+            ChargingIconStyle.original.title,
+            "Original Charging Icon"
+        )
+    }
+
+    func testPercentagePositionsHaveStableTitlesAndDefaultOrder() {
+        XCTAssertEqual(
+            PercentagePosition.allCases,
+            [.rightOfBattery, .leftOfBattery]
+        )
+        XCTAssertEqual(
+            PercentagePosition.rightOfBattery.title,
+            "Right of Battery"
+        )
+        XCTAssertEqual(
+            PercentagePosition.leftOfBattery.title,
+            "Left of Battery"
+        )
+    }
+
     func testBatteryHealthParserUsesSystemProfilerValues() {
         let data = Data(
             """
