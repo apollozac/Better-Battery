@@ -7,6 +7,11 @@ but putting the percentage inside the battery makes it harder to read at a
 glance. Better Battery restores that legibility without trying to become a
 battery-management suite.
 
+![The compact macOS 27 battery percentage beside Better Battery's larger, more legible icon and percentage](docs/better-battery-example.png)
+
+The first indicator is macOS 27's compact percentage. Better Battery is shown
+beside it with a larger battery icon and clearly separated percentage.
+
 ## Download
 
 [Download the latest version of Better Battery](https://github.com/apollozac/Better-Battery/releases/latest/download/Better-Battery.dmg)
