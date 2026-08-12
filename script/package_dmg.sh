@@ -55,6 +55,7 @@ cleanup() {
 trap cleanup EXIT
 
 osascript <<'APPLESCRIPT'
+set backgroundImage to POSIX file "/Volumes/Better Battery/.background/background.png" as alias
 tell application "Finder"
     tell disk "Better Battery"
         open
@@ -66,7 +67,7 @@ tell application "Finder"
         set arrangement of viewOptions to not arranged
         set icon size of viewOptions to 112
         set text size of viewOptions to 14
-        set background picture of viewOptions to file ".background:background.png"
+        set background picture of viewOptions to backgroundImage
         set position of item "Better Battery.app" of container window to {160, 210}
         set position of item "Applications" of container window to {440, 210}
         close

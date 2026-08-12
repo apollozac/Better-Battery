@@ -58,12 +58,9 @@ if [[ "$SKIP_NOTARIZATION" != "1" ]]; then
     xcrun notarytool submit "$OUTPUT_ZIP" \
         --keychain-profile "$NOTARY_PROFILE" \
         --wait
-    xcrun stapler staple "$APP_BUNDLE"
-    xcrun stapler validate "$APP_BUNDLE"
-    spctl --assess --type execute --verbose=4 "$APP_BUNDLE"
-
-    rm -f "$OUTPUT_ZIP"
-    ditto -c -k --norsrc --noextattr --noqtn --noacl --keepParent "$APP_BUNDLE" "$OUTPUT_ZIP"
+    # Keep the accepted app's code seal untouched. The distributable DMG is
+    # stapled after it is notarized, so Gatekeeper can validate it offline.
+    codesign --verify --deep --strict --verbose=2 "$APP_BUNDLE"
 fi
 
 echo "$OUTPUT_ZIP"
