@@ -9,10 +9,10 @@ battery-management suite.
 
 ## Download
 
-[Download the latest version of Better Battery](https://github.com/apollozac/Better-Battery/releases/latest/download/Better-Battery.zip)
+[Download the latest version of Better Battery](https://github.com/apollozac/Better-Battery/releases/latest/download/Better-Battery.dmg)
 
-Better Battery requires macOS 27 or later. Unzip the download, move
-**Better Battery.app** to Applications, and open it. The downloadable build is
+Better Battery requires macOS 27 or later. Open the disk image, drag
+**Better Battery** to Applications, and open it. The downloadable build is
 signed and notarized by Apple.
 
 ## What it does
@@ -49,10 +49,10 @@ Run the tests with:
 swift test --disable-sandbox
 ```
 
-Maintainers can create a signed and notarized release ZIP with:
+Maintainers can create signed and notarized ZIP and DMG releases with:
 
 ```sh
-BETTER_BATTERY_NOTARY_PROFILE="your-notarytool-profile" ./script/package_release.sh
+BETTER_BATTERY_NOTARY_PROFILE="your-notarytool-profile" ./script/package_dmg.sh
 ```
 
 ## Privacy
