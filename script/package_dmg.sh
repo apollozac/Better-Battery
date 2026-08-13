@@ -13,6 +13,7 @@ RW_DMG="/private/tmp/com.local.BetterBattery-release.dmg"
 OUTPUT_DMG="$OUTPUT_DIR/Better-Battery.dmg"
 BACKGROUND_DIR="$DMG_ROOT/.background"
 BACKGROUND_IMAGE="$BACKGROUND_DIR/background.png"
+VOLUME_ICON_SOURCE="$APP_BUNDLE/Contents/Resources/AppIcon.icns"
 SIGN_IDENTITY="${BETTER_BATTERY_SIGN_IDENTITY:-Developer ID Application: zac hall (XWKP9KZ69G)}"
 NOTARY_PROFILE="${BETTER_BATTERY_NOTARY_PROFILE:-${NOTARY_PROFILE:-}}"
 export CLANG_MODULE_CACHE_PATH="/private/tmp/com.local.BetterBattery-module-cache"
@@ -79,6 +80,10 @@ tell application "Finder"
 end tell
 APPLESCRIPT
 
+cp "$VOLUME_ICON_SOURCE" "$MOUNT_POINT/.VolumeIcon.icns"
+SetFile -a C "$MOUNT_POINT"
+test -f "$MOUNT_POINT/.VolumeIcon.icns"
+xattr -p com.apple.FinderInfo "$MOUNT_POINT" >/dev/null
 sync
 hdiutil detach "$DEVICE" -quiet
 DEVICE=""
