@@ -13,7 +13,9 @@ RW_DMG="/private/tmp/com.local.BetterBattery-release.dmg"
 OUTPUT_DMG="$OUTPUT_DIR/Better-Battery.dmg"
 BACKGROUND_DIR="$DMG_ROOT/.background"
 BACKGROUND_IMAGE="$BACKGROUND_DIR/background.png"
-VOLUME_ICON_SOURCE="$APP_BUNDLE/Contents/Resources/AppIcon.icns"
+VOLUME_ICON_DIR="/private/tmp/com.local.BetterBattery-volume-icon.iconset"
+VOLUME_ICON_PNG="/private/tmp/com.local.BetterBattery-volume-icon.png"
+VOLUME_ICON_SOURCE="/private/tmp/com.local.BetterBattery-volume-icon.icns"
 SIGN_IDENTITY="${BETTER_BATTERY_SIGN_IDENTITY:-Developer ID Application: zac hall (XWKP9KZ69G)}"
 NOTARY_PROFILE="${BETTER_BATTERY_NOTARY_PROFILE:-${NOTARY_PROFILE:-}}"
 export CLANG_MODULE_CACHE_PATH="/private/tmp/com.local.BetterBattery-module-cache"
@@ -28,6 +30,19 @@ fi
 cd "$ROOT_DIR"
 BETTER_BATTERY_NOTARY_PROFILE="$NOTARY_PROFILE" \
     "$ROOT_DIR/script/package_release.sh" >/dev/null
+
+rm -rf "$VOLUME_ICON_DIR"
+rm -f "$VOLUME_ICON_PNG" "$VOLUME_ICON_SOURCE"
+mkdir -p "$VOLUME_ICON_DIR"
+swift "$ROOT_DIR/script/render_volume_icon.swift" "$VOLUME_ICON_PNG"
+for size in 16 32 128 256 512; do
+    sips -z "$size" "$size" "$VOLUME_ICON_PNG" \
+        --out "$VOLUME_ICON_DIR/icon_${size}x${size}.png" >/dev/null
+    double_size=$((size * 2))
+    sips -z "$double_size" "$double_size" "$VOLUME_ICON_PNG" \
+        --out "$VOLUME_ICON_DIR/icon_${size}x${size}@2x.png" >/dev/null
+done
+iconutil -c icns "$VOLUME_ICON_DIR" -o "$VOLUME_ICON_SOURCE"
 
 rm -rf "$DMG_ROOT"
 mkdir -p "$BACKGROUND_DIR"
