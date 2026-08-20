@@ -367,6 +367,15 @@ final class BatterySnapshotTests: XCTestCase {
         )
         XCTAssertEqual(item.title, "Power Source: Battery")
         XCTAssertEqual(row.title, "Power Source: Battery")
+
+        let font = NSFont.menuFont(ofSize: 0)
+        let typographicWidth = (row.title as NSString).size(
+            withAttributes: [.font: font]
+        ).width
+        XCTAssertGreaterThan(
+            row.intrinsicContentSize.width,
+            ceil(typographicWidth) + 29
+        )
     }
 
     func testLoginItemPresentationReflectsSystemRegistrationState() {
@@ -443,6 +452,14 @@ final class BatterySnapshotTests: XCTestCase {
         let narrowDigits = ("11" as NSString).size(withAttributes: [.font: font]).width
         let wideDigits = ("88" as NSString).size(withAttributes: [.font: font]).width
         XCTAssertEqual(narrowDigits, wideDigits, accuracy: 0.01)
+    }
+
+    @MainActor
+    func testStatusItemHasStableAutosaveName() {
+        XCTAssertEqual(
+            BatteryStatusController.statusItemAutosaveName,
+            "BetterBatteryStatusItem"
+        )
     }
 
     @MainActor

@@ -1,5 +1,6 @@
 import AppKit
 import IOKit.ps
+import Sparkle
 
 private func batteryPowerSourceDidChange(_ context: UnsafeMutableRawPointer?) {
     guard let context else {
@@ -61,7 +62,10 @@ final class InformationalMenuRowView: NSView {
 
     private func resizeToFit() {
         let font = label.font ?? NSFont.menuFont(ofSize: 0)
-        let textSize = (title as NSString).size(withAttributes: [.font: font])
+        // NSTextFieldCell adds horizontal drawing insets beyond the string's
+        // typographic advance. Using only NSString.size clips the last glyph.
+        let textSize = label.cell?.cellSize ??
+            (title as NSString).size(withAttributes: [.font: font])
         frame.size = NSSize(
             width: ceil(textSize.width) + (Self.horizontalInset * 2),
             height: Self.rowHeight
@@ -82,6 +86,7 @@ final class InformationalMenuRowView: NSView {
 
 @MainActor
 final class BatteryStatusController: NSObject, NSMenuDelegate {
+    static let statusItemAutosaveName = "BetterBatteryStatusItem"
     static let standardSafetyRefreshInterval: TimeInterval = 5 * 60
     static let fullyChargedSafetyRefreshInterval: TimeInterval = 15 * 60
     static let menuRefreshFreshnessInterval: TimeInterval = 5
@@ -92,6 +97,7 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
     )
 
     private let reader = BatteryReader()
+    private let updaterController: SPUStandardUpdaterController?
     private let batteryHealthCache = BatteryHealthCache()
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let powerSourceItem = NSMenuItem(
@@ -120,6 +126,11 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
     private var lastStatusPresentation: StatusPresentation?
     private var isShowingUnavailableStatus = false
     private var lastSuccessfulRefreshUptime: TimeInterval?
+
+    init(updaterController: SPUStandardUpdaterController? = nil) {
+        self.updaterController = updaterController
+        super.init()
+    }
 
     func start() {
         configureStatusItem()
@@ -153,6 +164,8 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
     }
 
     private func configureStatusItem() {
+        statusItem.autosaveName = Self.statusItemAutosaveName
+
         if let button = statusItem.button {
             button.imagePosition = .imageLeading
             button.imageHugsTitle = true
@@ -173,6 +186,15 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
         menu.addItem(powerSourceItem)
         menu.addItem(timeItem)
         menu.addItem(.separator())
+        if let updaterController {
+            let updateItem = NSMenuItem(
+                title: "Check for Updates…",
+                action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)),
+                keyEquivalent: ""
+            )
+            updateItem.target = updaterController
+            menu.addItem(updateItem)
+        }
         menu.addItem(settingsItem)
         menu.addItem(.separator())
 
@@ -365,7 +387,7 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
         refresh()
     }
 
-    func menuWillOpen(_ menu: NSMenu) {
+    func menuNeedsUpdate(_ menu: NSMenu) {
         if Self.shouldRefreshOnMenuOpen(
             lastSuccessfulRefreshUptime: lastSuccessfulRefreshUptime,
             currentUptime: ProcessInfo.processInfo.systemUptime

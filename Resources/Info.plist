@@ -19,9 +19,17 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-	<string>1.4.0</string>
+    <string>1.5.0</string>
     <key>CFBundleVersion</key>
-	<string>38</string>
+    <string>39</string>
+    <key>SUFeedURL</key>
+    <string>https://raw.githubusercontent.com/apollozac/Better-Battery/main/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>UHVER3VU6RhPgZp4c+fv9KTLHQX27wRadduhOxGXg84=</string>
+    <key>SUEnableAutomaticChecks</key>
+    <true/>
+    <key>SUAllowsAutomaticUpdates</key>
+    <true/>
     <key>LSMinimumSystemVersion</key>
     <string>27.0</string>
     <key>LSUIElement</key>

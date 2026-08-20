@@ -12,6 +12,7 @@ APP_BUNDLE="$DIST_DIR/$DISPLAY_NAME.app"
 APP_CONTENTS="$APP_BUNDLE/Contents"
 APP_MACOS="$APP_CONTENTS/MacOS"
 APP_RESOURCES="$APP_CONTENTS/Resources"
+APP_FRAMEWORKS="$APP_CONTENTS/Frameworks"
 APP_BINARY="$APP_MACOS/$APP_NAME"
 if [[ -z "${DEVELOPER_DIR:-}" && -d /Applications/Xcode-beta.app ]]; then
     export DEVELOPER_DIR="/Applications/Xcode-beta.app/Contents/Developer"
@@ -28,11 +29,16 @@ swift build --disable-sandbox
 BUILD_BINARY="$(swift build --disable-sandbox --show-bin-path)/$APP_NAME"
 
 rm -rf "$APP_BUNDLE"
-mkdir -p "$APP_MACOS"
+mkdir -p "$APP_MACOS" "$APP_FRAMEWORKS"
 cp "$BUILD_BINARY" "$APP_BINARY"
+ditto \
+    "$ROOT_DIR/.build/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework" \
+    "$APP_FRAMEWORKS/Sparkle.framework"
 cp "$ROOT_DIR/Resources/Info.plist" "$APP_CONTENTS/Info.plist"
 "$ROOT_DIR/script/compile_app_icon.sh" "$APP_RESOURCES" "$BUNDLE_ID"
 chmod +x "$APP_BINARY"
+xattr -cr "$APP_BUNDLE"
+codesign --force --deep --sign - "$APP_FRAMEWORKS/Sparkle.framework" >/dev/null
 codesign --force --sign - "$APP_BUNDLE" >/dev/null
 
 open_app() {

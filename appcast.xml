@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Better Battery</title>
+        <item>
+            <title>1.5.0</title>
+            <pubDate>Wed, 19 Aug 2026 11:42:34 -0500</pubDate>
+            <link>https://apollozac.com/better-battery</link>
+            <sparkle:version>39</sparkle:version>
+            <sparkle:shortVersionString>1.5.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.5.0/Better-Battery.zip" length="2916006" type="application/octet-stream" sparkle:edSignature="yCY+yuoFzMCVY/cap8UfTdWv6fk9sr39Rn+b+HR0FDFBf1nvdIfHdutgR24I4FPbHZrhxHpYuPCWGH+xKf+OAw=="/>
+        </item>
+    </channel>
+</rss>

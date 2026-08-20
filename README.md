@@ -27,8 +27,9 @@ signed and notarized by Apple.
 - Offers a percentage-only mode designed to sit beside Apple's battery icon.
 - Displays battery condition, maximum capacity, and cycle count in Settings.
 - Can open automatically when you log in.
+- Checks for signed updates and can install them automatically.
 - Uses native macOS power notifications with a low-frequency safety refresh.
-- Includes no accounts, analytics, advertising, or network access.
+- Includes no accounts, analytics, or advertising.
 
 That is intentionally the whole app: no charge limits, automation, or
 background dashboards.
@@ -60,11 +61,19 @@ Maintainers can create signed and notarized ZIP and DMG releases with:
 BETTER_BATTERY_NOTARY_PROFILE="your-notarytool-profile" ./script/package_dmg.sh
 ```
 
+After uploading the ZIP to a GitHub release, generate the signed Sparkle feed
+for that version with:
+
+```sh
+./script/generate_appcast.sh 1.5.0
+```
+
 ## Privacy
 
 Better Battery reads battery and power-source information supplied locally by
-macOS. It does not collect, transmit, or sell data, and it contains no analytics
-or advertising frameworks.
+macOS. Its only network activity is checking the public signed update feed and
+downloading an update when one is available. It does not collect, transmit, or
+sell user data, and it contains no analytics or advertising frameworks.
 
 ## License
 

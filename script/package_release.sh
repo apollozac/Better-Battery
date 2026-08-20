@@ -13,6 +13,7 @@ APP_BUNDLE="$STAGING_DIR/$DISPLAY_NAME.app"
 APP_CONTENTS="$APP_BUNDLE/Contents"
 APP_MACOS="$APP_CONTENTS/MacOS"
 APP_RESOURCES="$APP_CONTENTS/Resources"
+APP_FRAMEWORKS="$APP_CONTENTS/Frameworks"
 OUTPUT_ZIP="$OUTPUT_DIR/Better-Battery.zip"
 SIGN_IDENTITY="${BETTER_BATTERY_SIGN_IDENTITY:-Developer ID Application: zac hall (XWKP9KZ69G)}"
 NOTARY_PROFILE="${BETTER_BATTERY_NOTARY_PROFILE:-${NOTARY_PROFILE:-}}"
@@ -37,12 +38,22 @@ swift build --disable-sandbox -c release --scratch-path "$SCRATCH_DIR"
 BUILD_BINARY="$(swift build --disable-sandbox -c release --scratch-path "$SCRATCH_DIR" --show-bin-path)/$APP_NAME"
 
 rm -rf "$STAGING_DIR"
-mkdir -p "$APP_MACOS"
+mkdir -p "$APP_MACOS" "$APP_FRAMEWORKS"
 cp "$BUILD_BINARY" "$APP_MACOS/$APP_NAME"
+ditto \
+    "$SCRATCH_DIR/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework" \
+    "$APP_FRAMEWORKS/Sparkle.framework"
 cp "$ROOT_DIR/Resources/Info.plist" "$APP_CONTENTS/Info.plist"
 "$ROOT_DIR/script/compile_app_icon.sh" "$APP_RESOURCES" "$BUNDLE_ID"
 chmod +x "$APP_MACOS/$APP_NAME"
 xattr -cr "$APP_BUNDLE"
+codesign \
+    --force \
+    --deep \
+    --sign "$SIGN_IDENTITY" \
+    --options runtime \
+    --timestamp \
+    "$APP_FRAMEWORKS/Sparkle.framework" >/dev/null
 codesign \
     --force \
     --sign "$SIGN_IDENTITY" \

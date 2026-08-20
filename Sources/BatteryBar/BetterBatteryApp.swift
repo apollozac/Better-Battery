@@ -1,4 +1,5 @@
 import AppKit
+import Sparkle
 
 @main
 enum BetterBatteryApp {
@@ -14,11 +15,18 @@ enum BetterBatteryApp {
 @MainActor
 private final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusController: BatteryStatusController?
+    private let updaterController = SPUStandardUpdaterController(
+        startingUpdater: true,
+        updaterDelegate: nil,
+        userDriverDelegate: nil
+    )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
 
-        let controller = BatteryStatusController()
+        let controller = BatteryStatusController(
+            updaterController: updaterController
+        )
         controller.start()
         statusController = controller
     }

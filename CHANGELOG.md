@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0
+
+- Added secure automatic updates and a manual Check for Updates command using
+  Sparkle.
+- Prevented the menu from changing size after its glass surface is displayed.
+
 ## 1.4.0
 
 - Adds percentage-matched battery fill levels.
