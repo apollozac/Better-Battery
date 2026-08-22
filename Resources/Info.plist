@@ -21,7 +21,7 @@
     <key>CFBundleShortVersionString</key>
     <string>1.6.0</string>
     <key>CFBundleVersion</key>
-    <string>40</string>
+    <string>41</string>
     <key>SUFeedURL</key>
     <string>https://raw.githubusercontent.com/apollozac/Better-Battery/main/appcast.xml</string>
     <key>SUPublicEDKey</key>
