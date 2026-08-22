@@ -40,7 +40,7 @@ final class SettingsWindowController:
     NSWindowDelegate,
     NSToolbarDelegate
 {
-    private static let contentSize = NSSize(width: 560, height: 320)
+    private static let contentSize = NSSize(width: 560, height: 390)
     static let batteryCycleSupportURL = URL(
         string: "https://support.apple.com/en-us/102888"
     )!
@@ -48,9 +48,15 @@ final class SettingsWindowController:
     var onClose: (() -> Void)?
 
     private let batteryHealthCache: BatteryHealthCache
+    private let batteryReader = BatteryReader()
     private let loginItemManager = LoginItemManager()
     private let percentageOnlyCheckbox = NSButton(
         checkboxWithTitle: "Show Percentage Only",
+        target: nil,
+        action: nil
+    )
+    private let hidePercentSymbolCheckbox = NSButton(
+        checkboxWithTitle: "Hide Percent Symbol",
         target: nil,
         action: nil
     )
@@ -68,6 +74,8 @@ final class SettingsWindowController:
         pullsDown: false
     )
     private let loginDetailLabel = SettingsWindowController.makeDetailLabel("")
+    private let percentSymbolDetailLabel =
+        SettingsWindowController.makeDetailLabel("")
     private let conditionValueLabel = SettingsWindowController.makeValueLabel()
     private let capacityValueLabel = SettingsWindowController.makeValueLabel()
     private let cycleCountValueLabel = SettingsWindowController.makeValueLabel()
@@ -108,6 +116,8 @@ final class SettingsWindowController:
 
         percentageOnlyCheckbox.target = self
         percentageOnlyCheckbox.action = #selector(togglePercentageOnly)
+        hidePercentSymbolCheckbox.target = self
+        hidePercentSymbolCheckbox.action = #selector(togglePercentSymbol)
         chargingIconStylePopUp.addItems(
             withTitles: ChargingIconStyle.allCases.map(\.title)
         )
@@ -158,6 +168,7 @@ final class SettingsWindowController:
         let view = NSView()
 
         percentageOnlyCheckbox.font = .systemFont(ofSize: 14)
+        hidePercentSymbolCheckbox.font = .systemFont(ofSize: 14)
         openAtLoginCheckbox.font = .systemFont(ofSize: 14)
 
         let percentageDetail = Self.makeDetailLabel(
@@ -168,6 +179,10 @@ final class SettingsWindowController:
             control: percentageOnlyCheckbox,
             detail: percentageDetail
         )
+        let percentSymbolStack = Self.makeControlStack(
+            control: hidePercentSymbolCheckbox,
+            detail: percentSymbolDetailLabel
+        )
         let chargingIconLabel = NSTextField(labelWithString: "Charging Icon")
         chargingIconLabel.font = .systemFont(ofSize: 14)
         let chargingIconControl = NSStackView(
@@ -177,7 +192,7 @@ final class SettingsWindowController:
         chargingIconControl.alignment = .centerY
         chargingIconControl.spacing = 10
         let chargingIconDetail = Self.makeDetailLabel(
-            "Choose how the battery icon appears while connected to power."
+            "Battery Level reflects the current charge. Full Battery always appears filled."
         )
         let chargingIconStack = Self.makeControlStack(
             control: chargingIconControl,
@@ -208,6 +223,7 @@ final class SettingsWindowController:
         let stack = NSStackView(
             views: [
                 percentageStack,
+                percentSymbolStack,
                 chargingIconStack,
                 percentagePositionStack,
                 loginStack
@@ -287,8 +303,13 @@ final class SettingsWindowController:
     }
 
     private func refreshGeneralControls() {
+        percentSymbolDetailLabel.stringValue = Self.percentSymbolDetail(
+            percentage: batteryReader.currentSnapshot()?.percentage
+        )
         percentageOnlyCheckbox.state =
             AppPreferences.showsPercentageOnly ? .on : .off
+        hidePercentSymbolCheckbox.state =
+            AppPreferences.hidesPercentSymbol ? .on : .off
         chargingIconStylePopUp.selectItem(
             at: ChargingIconStyle.allCases.firstIndex(
                 of: AppPreferences.chargingIconStyle
@@ -325,8 +346,19 @@ final class SettingsWindowController:
         }
     }
 
+    nonisolated static func percentSymbolDetail(percentage: Int?) -> String {
+        guard let percentage else {
+            return "Display the battery level without the percent symbol."
+        }
+        return "Display \(percentage) instead of \(percentage)%."
+    }
+
     @objc private func togglePercentageOnly() {
         AppPreferences.showsPercentageOnly = percentageOnlyCheckbox.state == .on
+    }
+
+    @objc private func togglePercentSymbol() {
+        AppPreferences.hidesPercentSymbol = hidePercentSymbolCheckbox.state == .on
     }
 
     @objc private func changeChargingIconStyle() {

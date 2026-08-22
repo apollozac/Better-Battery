@@ -133,11 +133,39 @@ final class BatterySnapshotTests: XCTestCase {
         )
         XCTAssertEqual(
             ChargingIconStyle.percentageFill.title,
-            "Percentage Fill"
+            "Battery Level + Bolt"
         )
         XCTAssertEqual(
             ChargingIconStyle.original.title,
-            "Original Charging Icon"
+            "Full Battery + Bolt"
+        )
+    }
+
+    func testPercentageTitleCanHidePercentSymbol() {
+        XCTAssertEqual(
+            BatteryStatusController.percentageTitle(
+                percentage: 54,
+                hidesPercentSymbol: false
+            ),
+            "54%"
+        )
+        XCTAssertEqual(
+            BatteryStatusController.percentageTitle(
+                percentage: 54,
+                hidesPercentSymbol: true
+            ),
+            "54"
+        )
+    }
+
+    func testPercentSymbolSettingUsesCurrentBatteryLevel() {
+        XCTAssertEqual(
+            SettingsWindowController.percentSymbolDetail(percentage: 87),
+            "Display 87 instead of 87%."
+        )
+        XCTAssertEqual(
+            SettingsWindowController.percentSymbolDetail(percentage: nil),
+            "Display the battery level without the percent symbol."
         )
     }
 

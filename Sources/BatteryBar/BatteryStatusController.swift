@@ -21,6 +21,7 @@ private struct StatusPresentation: Equatable {
     let isConnectedToPower: Bool
     let stateDescription: String
     let showsPercentageOnly: Bool
+    let hidesPercentSymbol: Bool
     let chargingIconStyle: ChargingIconStyle
     let percentagePosition: PercentagePosition
 }
@@ -234,6 +235,13 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
         "Power Source: \(snapshot.powerSourceDescription)"
     }
 
+    nonisolated static func percentageTitle(
+        percentage: Int,
+        hidesPercentSymbol: Bool
+    ) -> String {
+        "\(percentage)\(hidesPercentSymbol ? "" : "%")"
+    }
+
     static func safetyRefreshInterval(
         for snapshot: BatterySnapshot?
     ) -> TimeInterval {
@@ -293,12 +301,17 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
         lastSuccessfulRefreshUptime = ProcessInfo.processInfo.systemUptime
         updateSafetyRefreshTimer(for: snapshot)
 
-        let title = "\(snapshot.percentage)%"
+        let hidesPercentSymbol = AppPreferences.hidesPercentSymbol
+        let title = Self.percentageTitle(
+            percentage: snapshot.percentage,
+            hidesPercentSymbol: hidesPercentSymbol
+        )
         let presentation = StatusPresentation(
             percentage: snapshot.percentage,
             isConnectedToPower: snapshot.isConnectedToPower,
             stateDescription: snapshot.stateDescription,
             showsPercentageOnly: AppPreferences.showsPercentageOnly,
+            hidesPercentSymbol: hidesPercentSymbol,
             chargingIconStyle: AppPreferences.chargingIconStyle,
             percentagePosition: AppPreferences.percentagePosition
         )

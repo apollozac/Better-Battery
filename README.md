@@ -65,7 +65,7 @@ After uploading the ZIP to a GitHub release, generate the signed Sparkle feed
 for that version with:
 
 ```sh
-./script/generate_appcast.sh 1.5.0
+./script/generate_appcast.sh 1.6.0
 ```
 
 ## Privacy

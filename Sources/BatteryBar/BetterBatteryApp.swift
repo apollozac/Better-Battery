@@ -23,6 +23,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        LoginItemManager().applyEnabledDefaultIfNeeded()
 
         let controller = BatteryStatusController(
             updaterController: updaterController

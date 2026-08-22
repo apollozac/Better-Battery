@@ -40,6 +40,18 @@ struct LoginItemManager {
         }
     }
 
+    func applyEnabledDefaultIfNeeded() {
+        guard !AppPreferences.hasAppliedOpenAtLoginDefault else {
+            return
+        }
+
+        AppPreferences.hasAppliedOpenAtLoginDefault = true
+        guard presentation.action == .register else {
+            return
+        }
+        try? service.register()
+    }
+
     static func presentation(
         for status: SMAppService.Status
     ) -> LoginItemPresentation {

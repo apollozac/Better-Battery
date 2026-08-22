@@ -7,9 +7,9 @@ enum ChargingIconStyle: String, CaseIterable {
     var title: String {
         switch self {
         case .percentageFill:
-            "Percentage Fill"
+            "Battery Level + Bolt"
         case .original:
-            "Original Charging Icon"
+            "Full Battery + Bolt"
         }
     }
 }
@@ -30,8 +30,11 @@ enum PercentagePosition: String, CaseIterable {
 
 enum AppPreferences {
     private static let percentageOnlyDefaultsKey = "ShowPercentageOnly"
+    private static let hidesPercentSymbolDefaultsKey = "HidePercentSymbol"
     private static let chargingIconStyleDefaultsKey = "ChargingIconStyle"
     private static let percentagePositionDefaultsKey = "PercentagePosition"
+    private static let appliedOpenAtLoginDefaultDefaultsKey =
+        "AppliedOpenAtLoginDefault"
 
     static let displayModeDidChangeNotification = Notification.Name(
         "BetterBatteryDisplayModeDidChange"
@@ -44,6 +47,20 @@ enum AppPreferences {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: percentageOnlyDefaultsKey)
+            NotificationCenter.default.post(
+                name: displayModeDidChangeNotification,
+                object: nil
+            )
+        }
+    }
+
+    static var hidesPercentSymbol: Bool {
+        get {
+            UserDefaults.standard.object(forKey: hidesPercentSymbolDefaultsKey)
+                as? Bool ?? false
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: hidesPercentSymbolDefaultsKey)
             NotificationCenter.default.post(
                 name: displayModeDidChangeNotification,
                 object: nil
@@ -95,6 +112,20 @@ enum AppPreferences {
             NotificationCenter.default.post(
                 name: displayModeDidChangeNotification,
                 object: nil
+            )
+        }
+    }
+
+    static var hasAppliedOpenAtLoginDefault: Bool {
+        get {
+            UserDefaults.standard.bool(
+                forKey: appliedOpenAtLoginDefaultDefaultsKey
+            )
+        }
+        set {
+            UserDefaults.standard.set(
+                newValue,
+                forKey: appliedOpenAtLoginDefaultDefaultsKey
             )
         }
     }
