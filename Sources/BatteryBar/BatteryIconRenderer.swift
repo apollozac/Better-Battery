@@ -157,7 +157,7 @@ enum BatteryIconRenderer {
             NSColor.black.setFill()
 
             if showsPowerBolt {
-                drawChargingBolt()
+                drawModernChargingBolt()
             }
             return true
         }
@@ -235,6 +235,27 @@ enum BatteryIconRenderer {
         boltPath.line(to: NSPoint(x: 11.5, y: 0.75))
         boltPath.line(to: NSPoint(x: 17.5, y: 8.55))
         boltPath.line(to: NSPoint(x: 14.15, y: 8.55))
+        boltPath.close()
+        boltPath.lineJoinStyle = .round
+
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current?.compositingOperation = .clear
+        boltPath.lineWidth = 2.75
+        boltPath.stroke()
+        NSGraphicsContext.restoreGraphicsState()
+
+        NSColor.black.setFill()
+        boltPath.fill()
+    }
+
+    private static func drawModernChargingBolt() {
+        let boltPath = NSBezierPath()
+        boltPath.move(to: NSPoint(x: 15.7, y: 14.7))
+        boltPath.line(to: NSPoint(x: 8.8, y: 7.7))
+        boltPath.line(to: NSPoint(x: 12.8, y: 7.7))
+        boltPath.line(to: NSPoint(x: 10.7, y: 0.3))
+        boltPath.line(to: NSPoint(x: 17.8, y: 8.7))
+        boltPath.line(to: NSPoint(x: 14.3, y: 8.7))
         boltPath.close()
         boltPath.lineJoinStyle = .round
 

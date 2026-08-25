@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.3
+
+- Refines the Modern charging bolt to match the macOS 27 system battery
+  indicator more closely while preserving the current battery-level fill.
+
 ## 1.6.2
 
 - Shows macOS's reported time-to-full estimate while the battery is finishing

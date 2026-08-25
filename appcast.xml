@@ -3,6 +3,15 @@
     <channel>
         <title>Better Battery</title>
         <item>
+            <title>1.6.3</title>
+            <pubDate>Tue, 25 Aug 2026 11:43:07 -0500</pubDate>
+            <link>https://apollozac.com/better-battery</link>
+            <sparkle:version>44</sparkle:version>
+            <sparkle:shortVersionString>1.6.3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.6.3/Better-Battery.zip" length="2941175" type="application/octet-stream" sparkle:edSignature="U2vaF+G/vGIJMpjXKKt4X2U8lPDTXR/os5rWdMTBAoolOrx/YV3U1n0O5aoA9xDnrjB7qh1/gx8FBLkfl2XGDw=="/>
+        </item>
+        <item>
             <title>1.6.2</title>
             <pubDate>Tue, 25 Aug 2026 10:39:14 -0500</pubDate>
             <link>https://apollozac.com/better-battery</link>
@@ -19,15 +28,6 @@
             <sparkle:shortVersionString>1.6.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
             <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.6.1/Better-Battery.zip" length="2940977" type="application/octet-stream" sparkle:edSignature="WXOgtUHNgbAt2ri4gHlPSy3rmQbXBOgSMtiAHzDAp5P+1VPv18cVyChSvTUyeqFF8j/cgYysqw9aV+OYX/4xCA=="/>
-        </item>
-        <item>
-            <title>1.6.0</title>
-            <pubDate>Fri, 21 Aug 2026 23:38:31 -0500</pubDate>
-            <link>https://apollozac.com/better-battery</link>
-            <sparkle:version>41</sparkle:version>
-            <sparkle:shortVersionString>1.6.0</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.6.0/Better-Battery.zip" length="2938230" type="application/octet-stream" sparkle:edSignature="4gPxKraGfCiVkf2NpBd/wkUhoQnF9/TThyx17fVZn9pAwLY5WMnLQZb9dR5bPqDb/XLayOQrvATt8W02etoSCA=="/>
         </item>
     </channel>
 </rss>
