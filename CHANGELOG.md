@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.2
+
+- Shows macOS's reported time-to-full estimate while the battery is finishing
+  its charge instead of hiding the estimate behind a generic status.
+
 ## 1.6.1
 
 - Adds a Modern battery design that matches the macOS 27 menu bar style while

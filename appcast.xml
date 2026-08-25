@@ -3,6 +3,15 @@
     <channel>
         <title>Better Battery</title>
         <item>
+            <title>1.6.2</title>
+            <pubDate>Tue, 25 Aug 2026 10:39:14 -0500</pubDate>
+            <link>https://apollozac.com/better-battery</link>
+            <sparkle:version>43</sparkle:version>
+            <sparkle:shortVersionString>1.6.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.6.2/Better-Battery.zip" length="2940996" type="application/octet-stream" sparkle:edSignature="ev+wi+++qKneoFHCBvKT1wQpUiV8V2SXGS4LtGMXi2GsJrV2G97Do/GepBQx9rFBOkI4iFQVQ3N+CHOJnbRRBA=="/>
+        </item>
+        <item>
             <title>1.6.1</title>
             <pubDate>Tue, 25 Aug 2026 09:56:07 -0500</pubDate>
             <link>https://apollozac.com/better-battery</link>
@@ -19,15 +28,6 @@
             <sparkle:shortVersionString>1.6.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
             <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.6.0/Better-Battery.zip" length="2938230" type="application/octet-stream" sparkle:edSignature="4gPxKraGfCiVkf2NpBd/wkUhoQnF9/TThyx17fVZn9pAwLY5WMnLQZb9dR5bPqDb/XLayOQrvATt8W02etoSCA=="/>
-        </item>
-        <item>
-            <title>1.5.0</title>
-            <pubDate>Wed, 19 Aug 2026 11:42:34 -0500</pubDate>
-            <link>https://apollozac.com/better-battery</link>
-            <sparkle:version>39</sparkle:version>
-            <sparkle:shortVersionString>1.5.0</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.5.0/Better-Battery.zip" length="2916006" type="application/octet-stream" sparkle:edSignature="yCY+yuoFzMCVY/cap8UfTdWv6fk9sr39Rn+b+HR0FDFBf1nvdIfHdutgR24I4FPbHZrhxHpYuPCWGH+xKf+OAw=="/>
         </item>
     </channel>
 </rss>

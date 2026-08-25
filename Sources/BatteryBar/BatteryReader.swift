@@ -46,7 +46,6 @@ struct BatteryReader {
                 isConnectedToPower: isConnectedToPower,
                 isCharging: isCharging,
                 isFullyCharged: isFullyCharged,
-                isFinishingCharge: isFinishingCharge,
                 reportedMinutesRemaining: rawDescription[kIOPSTimeToEmptyKey] as? Int,
                 reportedMinutesToFull: rawDescription[kIOPSTimeToFullChargeKey] as? Int,
                 globalMinutesRemaining: Self.globalMinutesRemaining,
@@ -79,7 +78,6 @@ struct BatteryReader {
         isConnectedToPower: Bool,
         isCharging: Bool,
         isFullyCharged: Bool,
-        isFinishingCharge: Bool,
         reportedMinutesRemaining: Int?,
         reportedMinutesToFull: Int?,
         globalMinutesRemaining: () -> Int?,
@@ -93,7 +91,6 @@ struct BatteryReader {
             isConnectedToPower
                 && isCharging
                 && !isFullyCharged
-                && !isFinishingCharge
         let toFull = shouldEstimateTimeToFull
             ? validEstimate(reportedMinutesToFull) ?? registryMinutesToFull()
             : nil

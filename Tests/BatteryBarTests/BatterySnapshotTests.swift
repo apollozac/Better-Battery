@@ -42,15 +42,29 @@ final class BatterySnapshotTests: XCTestCase {
         )
 
         let finishingCharge = BatterySnapshot(
-            percentage: 100,
+            percentage: 99,
+            isCharging: true,
+            isConnectedToPower: true,
+            isFullyCharged: false,
+            isFinishingCharge: true,
+            minutesRemaining: nil,
+            minutesToFull: 17
+        )
+        XCTAssertEqual(finishingCharge.stateDescription, "Finishing Charge")
+        XCTAssertEqual(finishingCharge.timeDescription, "17 min until full")
+
+        let finishingChargeWithoutEstimate = BatterySnapshot(
+            percentage: 99,
             isCharging: true,
             isConnectedToPower: true,
             isFullyCharged: false,
             isFinishingCharge: true,
             minutesRemaining: nil
         )
-        XCTAssertEqual(finishingCharge.stateDescription, "Finishing Charge")
-        XCTAssertEqual(finishingCharge.timeDescription, "Finishing Charge")
+        XCTAssertEqual(
+            finishingChargeWithoutEstimate.timeDescription,
+            "Finishing Charge"
+        )
 
         XCTAssertEqual(
             BatterySnapshot(
@@ -241,7 +255,6 @@ final class BatterySnapshotTests: XCTestCase {
             isConnectedToPower: true,
             isCharging: false,
             isFullyCharged: true,
-            isFinishingCharge: false,
             reportedMinutesRemaining: nil,
             reportedMinutesToFull: nil,
             globalMinutesRemaining: {
@@ -262,7 +275,6 @@ final class BatterySnapshotTests: XCTestCase {
             isConnectedToPower: false,
             isCharging: false,
             isFullyCharged: false,
-            isFinishingCharge: false,
             reportedMinutesRemaining: nil,
             reportedMinutesToFull: nil,
             globalMinutesRemaining: {
@@ -283,7 +295,6 @@ final class BatterySnapshotTests: XCTestCase {
             isConnectedToPower: true,
             isCharging: true,
             isFullyCharged: false,
-            isFinishingCharge: false,
             reportedMinutesRemaining: nil,
             reportedMinutesToFull: nil,
             globalMinutesRemaining: {
@@ -297,6 +308,26 @@ final class BatterySnapshotTests: XCTestCase {
         )
         XCTAssertNil(charging.remaining)
         XCTAssertEqual(charging.toFull, 30)
+        XCTAssertEqual(globalFallbackCalls, 1)
+        XCTAssertEqual(registryFallbackCalls, 1)
+
+        let finishingCharge = BatteryReader.timeEstimates(
+            isConnectedToPower: true,
+            isCharging: true,
+            isFullyCharged: false,
+            reportedMinutesRemaining: nil,
+            reportedMinutesToFull: 17,
+            globalMinutesRemaining: {
+                globalFallbackCalls += 1
+                return 120
+            },
+            registryMinutesToFull: {
+                registryFallbackCalls += 1
+                return 30
+            }
+        )
+        XCTAssertNil(finishingCharge.remaining)
+        XCTAssertEqual(finishingCharge.toFull, 17)
         XCTAssertEqual(globalFallbackCalls, 1)
         XCTAssertEqual(registryFallbackCalls, 1)
     }
