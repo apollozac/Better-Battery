@@ -22,6 +22,7 @@ private struct StatusPresentation: Equatable {
     let stateDescription: String
     let showsPercentageOnly: Bool
     let hidesPercentSymbol: Bool
+    let batteryDesign: BatteryDesign
     let chargingIconStyle: ChargingIconStyle
     let percentagePosition: PercentagePosition
 }
@@ -277,7 +278,8 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
                     : BatteryIconRenderer.image(
                         percentage: 0,
                         isConnectedToPower: false,
-                        chargingIconStyle: AppPreferences.chargingIconStyle
+                        chargingIconStyle: AppPreferences.chargingIconStyle,
+                        batteryDesign: AppPreferences.batteryDesign
                     )
                 statusItem.button?.title = title
                 statusItem.button?.toolTip = "Battery information unavailable"
@@ -312,6 +314,7 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
             stateDescription: snapshot.stateDescription,
             showsPercentageOnly: AppPreferences.showsPercentageOnly,
             hidesPercentSymbol: hidesPercentSymbol,
+            batteryDesign: AppPreferences.batteryDesign,
             chargingIconStyle: AppPreferences.chargingIconStyle,
             percentagePosition: AppPreferences.percentagePosition
         )
@@ -321,7 +324,8 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
                 : BatteryIconRenderer.image(
                     percentage: presentation.percentage,
                     isConnectedToPower: presentation.isConnectedToPower,
-                    chargingIconStyle: presentation.chargingIconStyle
+                    chargingIconStyle: presentation.chargingIconStyle,
+                    batteryDesign: presentation.batteryDesign
                 )
             statusItem.button?.title = title
             statusItem.button?.toolTip =

@@ -40,7 +40,7 @@ final class SettingsWindowController:
     NSWindowDelegate,
     NSToolbarDelegate
 {
-    private static let contentSize = NSSize(width: 560, height: 390)
+    private static let contentSize = NSSize(width: 560, height: 465)
     static let batteryCycleSupportURL = URL(
         string: "https://support.apple.com/en-us/102888"
     )!
@@ -66,6 +66,10 @@ final class SettingsWindowController:
         action: nil
     )
     private let chargingIconStylePopUp = NSPopUpButton(
+        frame: .zero,
+        pullsDown: false
+    )
+    private let batteryDesignPopUp = NSPopUpButton(
         frame: .zero,
         pullsDown: false
     )
@@ -118,6 +122,11 @@ final class SettingsWindowController:
         percentageOnlyCheckbox.action = #selector(togglePercentageOnly)
         hidePercentSymbolCheckbox.target = self
         hidePercentSymbolCheckbox.action = #selector(togglePercentSymbol)
+        batteryDesignPopUp.addItems(
+            withTitles: BatteryDesign.allCases.map(\.title)
+        )
+        batteryDesignPopUp.target = self
+        batteryDesignPopUp.action = #selector(changeBatteryDesign)
         chargingIconStylePopUp.addItems(
             withTitles: ChargingIconStyle.allCases.map(\.title)
         )
@@ -183,6 +192,21 @@ final class SettingsWindowController:
             control: hidePercentSymbolCheckbox,
             detail: percentSymbolDetailLabel
         )
+        let batteryDesignLabel = NSTextField(labelWithString: "Battery Design")
+        batteryDesignLabel.font = .systemFont(ofSize: 14)
+        let batteryDesignControl = NSStackView(
+            views: [batteryDesignLabel, batteryDesignPopUp]
+        )
+        batteryDesignControl.orientation = .horizontal
+        batteryDesignControl.alignment = .centerY
+        batteryDesignControl.spacing = 10
+        let batteryDesignDetail = Self.makeDetailLabel(
+            "Modern uses the filled macOS 27 design. Classic uses the outlined battery."
+        )
+        let batteryDesignStack = Self.makeControlStack(
+            control: batteryDesignControl,
+            detail: batteryDesignDetail
+        )
         let chargingIconLabel = NSTextField(labelWithString: "Charging Icon")
         chargingIconLabel.font = .systemFont(ofSize: 14)
         let chargingIconControl = NSStackView(
@@ -224,6 +248,7 @@ final class SettingsWindowController:
             views: [
                 percentageStack,
                 percentSymbolStack,
+                batteryDesignStack,
                 chargingIconStack,
                 percentagePositionStack,
                 loginStack
@@ -310,6 +335,11 @@ final class SettingsWindowController:
             AppPreferences.showsPercentageOnly ? .on : .off
         hidePercentSymbolCheckbox.state =
             AppPreferences.hidesPercentSymbol ? .on : .off
+        batteryDesignPopUp.selectItem(
+            at: BatteryDesign.allCases.firstIndex(
+                of: AppPreferences.batteryDesign
+            ) ?? 0
+        )
         chargingIconStylePopUp.selectItem(
             at: ChargingIconStyle.allCases.firstIndex(
                 of: AppPreferences.chargingIconStyle
@@ -368,6 +398,14 @@ final class SettingsWindowController:
         }
         AppPreferences.chargingIconStyle =
             ChargingIconStyle.allCases[selectedIndex]
+    }
+
+    @objc private func changeBatteryDesign() {
+        let selectedIndex = batteryDesignPopUp.indexOfSelectedItem
+        guard BatteryDesign.allCases.indices.contains(selectedIndex) else {
+            return
+        }
+        AppPreferences.batteryDesign = BatteryDesign.allCases[selectedIndex]
     }
 
     @objc private func changePercentagePosition() {

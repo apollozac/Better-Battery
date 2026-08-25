@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.1
+
+- Adds a Modern battery design that matches the macOS 27 menu bar style while
+  keeping the percentage outside the icon for legibility.
+- Keeps the Classic outlined battery available as an option.
+- Shows the current battery level continuously in the Modern icon, including
+  while charging with Battery Level + Bolt selected.
+
 ## 1.5.0
 
 - Added secure automatic updates and a manual Check for Updates command using

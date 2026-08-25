@@ -8,7 +8,8 @@ enum BatteryIconRenderer {
     static func image(
         percentage: Int,
         isConnectedToPower: Bool,
-        chargingIconStyle: ChargingIconStyle
+        chargingIconStyle: ChargingIconStyle,
+        batteryDesign: BatteryDesign
     ) -> NSImage {
         let clampedPercentage = min(max(percentage, 0), 100)
         let showsPowerBolt = Self.showsPowerBolt(
@@ -17,6 +18,18 @@ enum BatteryIconRenderer {
         let description = isConnectedToPower
             ? "\(clampedPercentage)% battery, connected to power"
             : "\(clampedPercentage)% battery"
+
+        if batteryDesign == .modern {
+            let displayedPercentage = showsPowerBolt
+                && chargingIconStyle == .original
+                ? 100
+                : clampedPercentage
+            return modernImage(
+                percentage: displayedPercentage,
+                showsPowerBolt: showsPowerBolt,
+                accessibilityDescription: description
+            )
+        }
 
         if showsPowerBolt, chargingIconStyle == .percentageFill {
             return chargingImage(
@@ -28,13 +41,10 @@ enum BatteryIconRenderer {
         let systemSymbolName = showsPowerBolt
             ? "battery.100percent.bolt"
             : symbolName(percentage: clampedPercentage)
-        if let image = NSImage(
-            systemSymbolName: systemSymbolName,
+        if let image = configuredSystemImage(
+            named: systemSymbolName,
             accessibilityDescription: description
-        )?.withSymbolConfiguration(
-            NSImage.SymbolConfiguration(pointSize: symbolPointSize, weight: .regular)
         ) {
-            image.isTemplate = true
             return image
         }
 
@@ -66,6 +76,111 @@ enum BatteryIconRenderer {
     static func chargingFillWidth(percentage: Int) -> CGFloat {
         let clampedPercentage = min(max(percentage, 0), 100)
         return chargingFillMaximumWidth * CGFloat(clampedPercentage) / 100
+    }
+
+    static func modernFillWidth(percentage: Int, bodyWidth: CGFloat = 23) -> CGFloat {
+        let clampedPercentage = min(max(percentage, 0), 100)
+        let rawWidth = bodyWidth * CGFloat(clampedPercentage) / 100
+        return (rawWidth * 2).rounded() / 2
+    }
+
+    private static func modernImage(
+        percentage: Int,
+        showsPowerBolt: Bool,
+        accessibilityDescription: String
+    ) -> NSImage {
+        let image = NSImage(size: chargingImageSize, flipped: false) { _ in
+            let bodyRect = NSRect(x: 1.5, y: 1.5, width: 23, height: 12)
+            let bodyPath = NSBezierPath(
+                roundedRect: bodyRect,
+                xRadius: 4,
+                yRadius: 4
+            )
+            NSColor.black.withAlphaComponent(0.5).setFill()
+            NSGraphicsContext.saveGraphicsState()
+            NSBezierPath(
+                rect: NSRect(x: 0, y: 0, width: 13, height: chargingImageSize.height)
+            ).addClip()
+            bodyPath.fill()
+            NSGraphicsContext.restoreGraphicsState()
+
+            let terminalSideBodyPath = NSBezierPath(
+                roundedRect: bodyRect,
+                xRadius: 4.0625,
+                yRadius: 4.0625
+            )
+            NSGraphicsContext.saveGraphicsState()
+            NSBezierPath(
+                rect: NSRect(
+                    x: 13,
+                    y: 0,
+                    width: chargingImageSize.width - 13,
+                    height: chargingImageSize.height
+                )
+            ).addClip()
+            terminalSideBodyPath.fill()
+            NSGraphicsContext.restoreGraphicsState()
+
+            let fillWidth = modernFillWidth(percentage: percentage)
+            if fillWidth > 0 {
+                NSColor.black.setFill()
+                NSGraphicsContext.saveGraphicsState()
+                NSBezierPath(
+                    rect: NSRect(
+                        x: bodyRect.minX,
+                        y: bodyRect.minY,
+                        width: fillWidth,
+                        height: bodyRect.height
+                    )
+                ).addClip()
+                bodyPath.fill()
+                terminalSideBodyPath.fill()
+                NSGraphicsContext.restoreGraphicsState()
+            }
+
+            let terminalRect = NSRect(x: 25.5, y: 5.5, width: 1.5, height: 4)
+            let terminalPath = NSBezierPath()
+            terminalPath.move(to: NSPoint(x: terminalRect.minX, y: terminalRect.minY))
+            terminalPath.curve(
+                to: NSPoint(x: terminalRect.maxX, y: terminalRect.midY),
+                controlPoint1: NSPoint(x: terminalRect.maxX, y: terminalRect.minY),
+                controlPoint2: NSPoint(x: terminalRect.maxX, y: terminalRect.midY)
+            )
+            terminalPath.curve(
+                to: NSPoint(x: terminalRect.minX, y: terminalRect.maxY),
+                controlPoint1: NSPoint(x: terminalRect.maxX, y: terminalRect.midY),
+                controlPoint2: NSPoint(x: terminalRect.maxX, y: terminalRect.maxY)
+            )
+            terminalPath.close()
+            NSColor.black.withAlphaComponent(0.58).setFill()
+            terminalPath.fill()
+            NSColor.black.setFill()
+
+            if showsPowerBolt {
+                drawChargingBolt()
+            }
+            return true
+        }
+
+        image.isTemplate = true
+        image.accessibilityDescription = accessibilityDescription
+        return image
+    }
+
+    private static func configuredSystemImage(
+        named symbolName: String,
+        accessibilityDescription: String
+    ) -> NSImage? {
+        guard let image = NSImage(
+            systemSymbolName: symbolName,
+            accessibilityDescription: accessibilityDescription
+        )?.withSymbolConfiguration(
+            NSImage.SymbolConfiguration(pointSize: symbolPointSize, weight: .regular)
+        ) else {
+            return nil
+        }
+        image.isTemplate = true
+        return image
     }
 
     private static func chargingImage(

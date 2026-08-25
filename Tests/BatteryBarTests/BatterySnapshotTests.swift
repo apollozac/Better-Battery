@@ -141,6 +141,19 @@ final class BatterySnapshotTests: XCTestCase {
         )
     }
 
+    func testBatteryDesignsHaveStableTitles() {
+        XCTAssertEqual(BatteryDesign.allCases, [.modern, .classic])
+        XCTAssertEqual(BatteryDesign.modern.title, "Modern")
+        XCTAssertEqual(BatteryDesign.classic.title, "Classic")
+    }
+
+    func testModernFillTracksBatteryLevelOnRetinaPixelGrid() {
+        XCTAssertEqual(BatteryIconRenderer.modernFillWidth(percentage: -1), 0)
+        XCTAssertEqual(BatteryIconRenderer.modernFillWidth(percentage: 50), 11.5)
+        XCTAssertEqual(BatteryIconRenderer.modernFillWidth(percentage: 95), 22)
+        XCTAssertEqual(BatteryIconRenderer.modernFillWidth(percentage: 101), 23)
+    }
+
     func testPercentageTitleCanHidePercentSymbol() {
         XCTAssertEqual(
             BatteryStatusController.percentageTitle(

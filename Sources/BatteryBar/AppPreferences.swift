@@ -1,5 +1,19 @@
 import Foundation
 
+enum BatteryDesign: String, CaseIterable {
+    case modern
+    case classic
+
+    var title: String {
+        switch self {
+        case .modern:
+            "Modern"
+        case .classic:
+            "Classic"
+        }
+    }
+}
+
 enum ChargingIconStyle: String, CaseIterable {
     case percentageFill
     case original
@@ -31,6 +45,7 @@ enum PercentagePosition: String, CaseIterable {
 enum AppPreferences {
     private static let percentageOnlyDefaultsKey = "ShowPercentageOnly"
     private static let hidesPercentSymbolDefaultsKey = "HidePercentSymbol"
+    private static let batteryDesignDefaultsKey = "BatteryDesign"
     private static let chargingIconStyleDefaultsKey = "ChargingIconStyle"
     private static let percentagePositionDefaultsKey = "PercentagePosition"
     private static let appliedOpenAtLoginDefaultDefaultsKey =
@@ -84,6 +99,30 @@ enum AppPreferences {
             UserDefaults.standard.set(
                 newValue.rawValue,
                 forKey: chargingIconStyleDefaultsKey
+            )
+            NotificationCenter.default.post(
+                name: displayModeDidChangeNotification,
+                object: nil
+            )
+        }
+    }
+
+    static var batteryDesign: BatteryDesign {
+        get {
+            guard
+                let rawValue = UserDefaults.standard.string(
+                    forKey: batteryDesignDefaultsKey
+                ),
+                let design = BatteryDesign(rawValue: rawValue)
+            else {
+                return .modern
+            }
+            return design
+        }
+        set {
+            UserDefaults.standard.set(
+                newValue.rawValue,
+                forKey: batteryDesignDefaultsKey
             )
             NotificationCenter.default.post(
                 name: displayModeDidChangeNotification,
