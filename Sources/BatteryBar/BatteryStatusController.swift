@@ -97,6 +97,7 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
         ofSize: NSFont.menuBarFont(ofSize: 0).pointSize,
         weight: .regular
     )
+    static let percentageBatteryAlignmentOffset: CGFloat = -0.75
 
     private let reader = BatteryReader()
     private let updaterController: SPUStandardUpdaterController?
@@ -243,6 +244,16 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
         "\(percentage)\(hidesPercentSymbol ? "" : "%")"
     }
 
+    static func attributedPercentageTitle(_ title: String) -> NSAttributedString {
+        NSAttributedString(
+            string: title,
+            attributes: [
+                .font: percentageFont,
+                .baselineOffset: percentageBatteryAlignmentOffset
+            ]
+        )
+    }
+
     static func safetyRefreshInterval(
         for snapshot: BatterySnapshot?
     ) -> TimeInterval {
@@ -387,6 +398,7 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
         }
 
         button.font = Self.percentageFont
+        button.attributedTitle = Self.attributedPercentageTitle(title)
         if showsPercentageOnly {
             button.imagePosition = .noImage
             let font = button.font ?? Self.percentageFont

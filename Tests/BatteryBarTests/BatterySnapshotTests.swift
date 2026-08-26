@@ -527,6 +527,28 @@ final class BatterySnapshotTests: XCTestCase {
     }
 
     @MainActor
+    func testPercentageCentersInEveryDisplayModeOnRetinaPixelGrid() {
+        XCTAssertEqual(
+            BatteryStatusController.percentageBatteryAlignmentOffset,
+            -0.75,
+            accuracy: 0.001
+        )
+        for title in ["54", "54%"] {
+            let attributedTitle = BatteryStatusController
+                .attributedPercentageTitle(title)
+            XCTAssertEqual(attributedTitle.string, title)
+            XCTAssertEqual(
+                attributedTitle.attribute(
+                    .baselineOffset,
+                    at: 0,
+                    effectiveRange: nil
+                ) as? CGFloat,
+                -0.75
+            )
+        }
+    }
+
+    @MainActor
     func testStatusItemHasStableAutosaveName() {
         XCTAssertEqual(
             BatteryStatusController.statusItemAutosaveName,

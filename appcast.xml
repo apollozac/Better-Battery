@@ -3,6 +3,15 @@
     <channel>
         <title>Better Battery</title>
         <item>
+            <title>1.6.4</title>
+            <pubDate>Wed, 26 Aug 2026 13:37:59 -0500</pubDate>
+            <link>https://apollozac.com/better-battery</link>
+            <sparkle:version>45</sparkle:version>
+            <sparkle:shortVersionString>1.6.4</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.6.4/Better-Battery.zip" length="2941534" type="application/octet-stream" sparkle:edSignature="mZT5nGGhXVVyRxt5DhohReGpl5DnMhwxoydN7rXx5maSpw1n0Hl4x8kotQNpEonoFs6IE85YZYFonGaeWTo4DA=="/>
+        </item>
+        <item>
             <title>1.6.3</title>
             <pubDate>Tue, 25 Aug 2026 11:43:07 -0500</pubDate>
             <link>https://apollozac.com/better-battery</link>
@@ -19,15 +28,6 @@
             <sparkle:shortVersionString>1.6.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
             <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.6.2/Better-Battery.zip" length="2940996" type="application/octet-stream" sparkle:edSignature="ev+wi+++qKneoFHCBvKT1wQpUiV8V2SXGS4LtGMXi2GsJrV2G97Do/GepBQx9rFBOkI4iFQVQ3N+CHOJnbRRBA=="/>
-        </item>
-        <item>
-            <title>1.6.1</title>
-            <pubDate>Tue, 25 Aug 2026 09:56:07 -0500</pubDate>
-            <link>https://apollozac.com/better-battery</link>
-            <sparkle:version>42</sparkle:version>
-            <sparkle:shortVersionString>1.6.1</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.6.1/Better-Battery.zip" length="2940977" type="application/octet-stream" sparkle:edSignature="WXOgtUHNgbAt2ri4gHlPSy3rmQbXBOgSMtiAHzDAp5P+1VPv18cVyChSvTUyeqFF8j/cgYysqw9aV+OYX/4xCA=="/>
         </item>
     </channel>
 </rss>

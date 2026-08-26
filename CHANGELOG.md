@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.4
+
+- Centers the percentage precisely against the battery icon across left,
+  right, percent-symbol, and percentage-only display modes.
+
 ## 1.6.3
 
 - Refines the Modern charging bolt to match the macOS 27 system battery
