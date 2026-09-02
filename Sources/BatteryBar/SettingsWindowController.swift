@@ -9,12 +9,15 @@ final class BatteryHealthCache {
 
 enum BetterBatterySettingsPane: String, CaseIterable {
     case general
+    case notifications
     case batteryHealth
 
     var title: String {
         switch self {
         case .general:
             "General"
+        case .notifications:
+            "Notifications"
         case .batteryHealth:
             "Battery Health"
         }
@@ -24,6 +27,8 @@ enum BetterBatterySettingsPane: String, CaseIterable {
         switch self {
         case .general:
             "gearshape"
+        case .notifications:
+            "bell"
         case .batteryHealth:
             "battery.100percent"
         }
@@ -38,16 +43,21 @@ enum BetterBatterySettingsPane: String, CaseIterable {
 final class SettingsWindowController:
     NSWindowController,
     NSWindowDelegate,
-    NSToolbarDelegate
+    NSToolbarDelegate,
+    NSTextFieldDelegate
 {
     private static let contentSize = NSSize(width: 560, height: 465)
     static let batteryCycleSupportURL = URL(
         string: "https://support.apple.com/en-us/102888"
     )!
+    static let systemBatteryGuidance =
+        "Hide Apple’s battery by Command-dragging it out of the menu bar, " +
+        "or unchecking Battery in System Settings › Menu Bar."
 
     var onClose: (() -> Void)?
 
     private let batteryHealthCache: BatteryHealthCache
+    private let notificationManager: BatteryNotificationManager
     private let batteryReader = BatteryReader()
     private let loginItemManager = LoginItemManager()
     private let percentageOnlyCheckbox = NSButton(
@@ -83,13 +93,36 @@ final class SettingsWindowController:
     private let conditionValueLabel = SettingsWindowController.makeValueLabel()
     private let capacityValueLabel = SettingsWindowController.makeValueLabel()
     private let cycleCountValueLabel = SettingsWindowController.makeValueLabel()
+    private var dischargingNotificationThresholdCheckboxes: [Int: NSButton] = [:]
+    private var chargingNotificationThresholdCheckboxes: [Int: NSButton] = [:]
+    private let customDischargingNotificationCheckbox = NSButton(
+        checkboxWithTitle: "Custom",
+        target: nil,
+        action: nil
+    )
+    private let customDischargingNotificationField = NSTextField(string: "30")
+    private let customDischargingNotificationStepper = NSStepper()
+    private let customChargingNotificationCheckbox = NSButton(
+        checkboxWithTitle: "Custom",
+        target: nil,
+        action: nil
+    )
+    private let customChargingNotificationField = NSTextField(string: "90")
+    private let customChargingNotificationStepper = NSStepper()
+    private let notificationStatusLabel =
+        SettingsWindowController.makeDetailLabel("")
 
     private lazy var generalView = makeGeneralView()
+    private lazy var notificationsView = makeNotificationsView()
     private lazy var batteryHealthView = makeBatteryHealthView()
     private var healthRefreshInProgress = false
 
-    init(batteryHealthCache: BatteryHealthCache) {
+    init(
+        batteryHealthCache: BatteryHealthCache,
+        notificationManager: BatteryNotificationManager
+    ) {
         self.batteryHealthCache = batteryHealthCache
+        self.notificationManager = notificationManager
         let window = NSWindow(
             contentRect: NSRect(
                 origin: .zero,
@@ -139,6 +172,26 @@ final class SettingsWindowController:
         percentagePositionPopUp.action = #selector(changePercentagePosition)
         openAtLoginCheckbox.target = self
         openAtLoginCheckbox.action = #selector(toggleOpenAtLogin)
+        customDischargingNotificationCheckbox.target = self
+        customDischargingNotificationCheckbox.action =
+            #selector(toggleCustomDischargingNotification)
+        customDischargingNotificationField.delegate = self
+        customDischargingNotificationField.target = self
+        customDischargingNotificationField.action =
+            #selector(changeCustomDischargingNotification)
+        customDischargingNotificationStepper.target = self
+        customDischargingNotificationStepper.action =
+            #selector(stepCustomDischargingNotification)
+        customChargingNotificationCheckbox.target = self
+        customChargingNotificationCheckbox.action =
+            #selector(toggleCustomChargingNotification)
+        customChargingNotificationField.delegate = self
+        customChargingNotificationField.target = self
+        customChargingNotificationField.action =
+            #selector(changeCustomChargingNotification)
+        customChargingNotificationStepper.target = self
+        customChargingNotificationStepper.action =
+            #selector(stepCustomChargingNotification)
 
         selectPane(.general)
     }
@@ -163,12 +216,22 @@ final class SettingsWindowController:
     private func selectPane(_ pane: BetterBatterySettingsPane) {
         window?.title = pane.title
         window?.toolbar?.selectedItemIdentifier = pane.toolbarIdentifier
-        window?.contentView = pane == .general ? generalView : batteryHealthView
+        switch pane {
+        case .general:
+            window?.contentView = generalView
+        case .notifications:
+            window?.contentView = notificationsView
+        case .batteryHealth:
+            window?.contentView = batteryHealthView
+        }
         window?.setContentSize(Self.contentSize)
 
-        if pane == .general {
+        switch pane {
+        case .general:
             refreshGeneralControls()
-        } else {
+        case .notifications:
+            refreshNotificationControls()
+        case .batteryHealth:
             refreshBatteryHealthIfNeeded()
         }
     }
@@ -180,6 +243,9 @@ final class SettingsWindowController:
         hidePercentSymbolCheckbox.font = .systemFont(ofSize: 14)
         openAtLoginCheckbox.font = .systemFont(ofSize: 14)
 
+        let systemBatteryGuidance = Self.makeDetailLabel(
+            Self.systemBatteryGuidance
+        )
         let percentageDetail = Self.makeDetailLabel(
             "Show the percentage without Better Battery’s battery icon."
         )
@@ -246,6 +312,7 @@ final class SettingsWindowController:
 
         let stack = NSStackView(
             views: [
+                systemBatteryGuidance,
                 percentageStack,
                 percentSymbolStack,
                 batteryDesignStack,
@@ -270,6 +337,132 @@ final class SettingsWindowController:
         ])
 
         return view
+    }
+
+    private func makeNotificationsView() -> NSView {
+        let view = NSView()
+
+        let dischargingHeading = NSTextField(
+            labelWithString: "Battery Draining"
+        )
+        dischargingHeading.font = .systemFont(ofSize: 14, weight: .medium)
+        let dischargingButtons =
+            AppPreferences.standardNotificationThresholds.map {
+                threshold -> NSButton in
+                let button = NSButton(
+                    checkboxWithTitle: "\(threshold)%",
+                    target: self,
+                    action: #selector(toggleDischargingNotificationThreshold(_:))
+                )
+                button.font = .systemFont(ofSize: 14)
+                button.tag = threshold
+                dischargingNotificationThresholdCheckboxes[threshold] = button
+                return button
+            }
+        let dischargingThresholdRow = NSStackView(views: dischargingButtons)
+        dischargingThresholdRow.orientation = .horizontal
+        dischargingThresholdRow.spacing = 10
+
+        let chargingHeading = NSTextField(
+            labelWithString: "Battery Charging"
+        )
+        chargingHeading.font = .systemFont(ofSize: 14, weight: .medium)
+        let chargingButtons = AppPreferences.standardNotificationThresholds.map {
+            threshold -> NSButton in
+            let button = NSButton(
+                checkboxWithTitle: "\(threshold)%",
+                target: self,
+                action: #selector(toggleChargingNotificationThreshold(_:))
+            )
+            button.font = .systemFont(ofSize: 14)
+            button.tag = threshold
+            chargingNotificationThresholdCheckboxes[threshold] = button
+            return button
+        }
+        let chargingThresholdRow = NSStackView(views: chargingButtons)
+        chargingThresholdRow.orientation = .horizontal
+        chargingThresholdRow.spacing = 10
+
+        let dischargingCustomRow = makeCustomNotificationRow(
+            checkbox: customDischargingNotificationCheckbox,
+            field: customDischargingNotificationField,
+            stepper: customDischargingNotificationStepper
+        )
+        let chargingCustomRow = makeCustomNotificationRow(
+            checkbox: customChargingNotificationCheckbox,
+            field: customChargingNotificationField,
+            stepper: customChargingNotificationStepper
+        )
+
+        let behaviorDetail = Self.makeDetailLabel(
+            "Draining alerts fire only as the battery level falls. Charging alerts fire only as it rises."
+        )
+
+        let stack = NSStackView(
+            views: [
+                dischargingHeading,
+                dischargingThresholdRow,
+                dischargingCustomRow,
+                chargingHeading,
+                chargingThresholdRow,
+                chargingCustomRow,
+                behaviorDetail,
+                notificationStatusLabel
+            ]
+        )
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.orientation = .vertical
+        stack.alignment = .leading
+        stack.setCustomSpacing(10, after: dischargingHeading)
+        stack.setCustomSpacing(8, after: dischargingThresholdRow)
+        stack.setCustomSpacing(24, after: dischargingCustomRow)
+        stack.setCustomSpacing(10, after: chargingHeading)
+        stack.setCustomSpacing(8, after: chargingThresholdRow)
+        stack.setCustomSpacing(24, after: chargingCustomRow)
+        stack.setCustomSpacing(14, after: behaviorDetail)
+        view.addSubview(stack)
+
+        NSLayoutConstraint.activate([
+            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48),
+            stack.trailingAnchor.constraint(
+                lessThanOrEqualTo: view.trailingAnchor,
+                constant: -48
+            ),
+            stack.topAnchor.constraint(equalTo: view.topAnchor, constant: 36)
+        ])
+
+        return view
+    }
+
+    private func makeCustomNotificationRow(
+        checkbox: NSButton,
+        field: NSTextField,
+        stepper: NSStepper
+    ) -> NSStackView {
+        checkbox.font = .systemFont(ofSize: 14)
+        field.alignment = .right
+        field.font = .systemFont(ofSize: 14)
+        field.translatesAutoresizingMaskIntoConstraints = false
+        field.widthAnchor.constraint(equalToConstant: 48).isActive = true
+        let numberFormatter = NumberFormatter()
+        numberFormatter.allowsFloats = false
+        numberFormatter.minimum = 1
+        numberFormatter.maximum = 100
+        field.formatter = numberFormatter
+
+        stepper.minValue = 1
+        stepper.maxValue = 100
+        stepper.increment = 1
+        stepper.valueWraps = false
+        let percentLabel = NSTextField(labelWithString: "%")
+        percentLabel.font = .systemFont(ofSize: 14)
+        let row = NSStackView(
+            views: [checkbox, field, stepper, percentLabel]
+        )
+        row.orientation = .horizontal
+        row.alignment = .centerY
+        row.spacing = 6
+        return row
     }
 
     private func makeBatteryHealthView() -> NSView {
@@ -376,6 +569,86 @@ final class SettingsWindowController:
         }
     }
 
+    private func refreshNotificationControls() {
+        let dischargingThresholds =
+            AppPreferences.dischargingNotificationThresholds
+        for (threshold, checkbox) in
+            dischargingNotificationThresholdCheckboxes
+        {
+            checkbox.state = dischargingThresholds.contains(threshold) ? .on : .off
+        }
+        let chargingThresholds = AppPreferences.chargingNotificationThresholds
+        for (threshold, checkbox) in chargingNotificationThresholdCheckboxes {
+            checkbox.state = chargingThresholds.contains(threshold) ? .on : .off
+        }
+
+        refreshCustomNotificationControls(
+            checkbox: customDischargingNotificationCheckbox,
+            field: customDischargingNotificationField,
+            stepper: customDischargingNotificationStepper,
+            enabled: AppPreferences.customDischargingNotificationEnabled,
+            percentage: AppPreferences.customDischargingNotificationPercentage
+        )
+        refreshCustomNotificationControls(
+            checkbox: customChargingNotificationCheckbox,
+            field: customChargingNotificationField,
+            stepper: customChargingNotificationStepper,
+            enabled: AppPreferences.customChargingNotificationEnabled,
+            percentage: AppPreferences.customChargingNotificationPercentage
+        )
+
+        refreshNotificationAuthorizationStatus()
+    }
+
+    private func refreshCustomNotificationControls(
+        checkbox: NSButton,
+        field: NSTextField,
+        stepper: NSStepper,
+        enabled: Bool,
+        percentage: Int
+    ) {
+        checkbox.state = enabled ? .on : .off
+        field.integerValue = percentage
+        stepper.integerValue = percentage
+        field.isEnabled = enabled
+        stepper.isEnabled = enabled
+    }
+
+    private func refreshNotificationAuthorizationStatus() {
+        guard AppPreferences.hasAnyNotificationThreshold else {
+            notificationStatusLabel.stringValue =
+                "Notifications are off until you choose a battery level."
+            return
+        }
+
+        notificationManager.authorizationStatus { [weak self] status in
+            switch status {
+            case .authorized, .provisional, .ephemeral:
+                self?.notificationStatusLabel.stringValue =
+                    "Notifications are enabled."
+            case .denied:
+                self?.notificationStatusLabel.stringValue =
+                    "Notifications are disabled in System Settings."
+            case .notDetermined:
+                self?.notificationStatusLabel.stringValue =
+                    "macOS will ask for permission to send notifications."
+            @unknown default:
+                self?.notificationStatusLabel.stringValue =
+                    "Notification permission is unavailable."
+            }
+        }
+    }
+
+    private func requestNotificationAuthorizationIfNeeded() {
+        guard AppPreferences.hasAnyNotificationThreshold else {
+            refreshNotificationAuthorizationStatus()
+            return
+        }
+        notificationManager.requestAuthorization { [weak self] _ in
+            self?.refreshNotificationAuthorizationStatus()
+        }
+    }
+
     nonisolated static func percentSymbolDetail(percentage: Int?) -> String {
         guard let percentage else {
             return "Display the battery level without the percent symbol."
@@ -425,6 +698,105 @@ final class SettingsWindowController:
             refreshGeneralControls()
             loginDetailLabel.stringValue = error.localizedDescription
         }
+    }
+
+    @objc private func toggleDischargingNotificationThreshold(
+        _ sender: NSButton
+    ) {
+        let threshold = sender.tag
+        guard AppPreferences.standardNotificationThresholds.contains(threshold)
+        else {
+            return
+        }
+        var thresholds = AppPreferences.dischargingNotificationThresholds
+        if sender.state == .on {
+            thresholds.insert(threshold)
+        } else {
+            thresholds.remove(threshold)
+        }
+        AppPreferences.dischargingNotificationThresholds = thresholds
+        requestNotificationAuthorizationIfNeeded()
+    }
+
+    @objc private func toggleChargingNotificationThreshold(_ sender: NSButton) {
+        let threshold = sender.tag
+        guard AppPreferences.standardNotificationThresholds.contains(threshold)
+        else {
+            return
+        }
+        var thresholds = AppPreferences.chargingNotificationThresholds
+        if sender.state == .on {
+            thresholds.insert(threshold)
+        } else {
+            thresholds.remove(threshold)
+        }
+        AppPreferences.chargingNotificationThresholds = thresholds
+        requestNotificationAuthorizationIfNeeded()
+    }
+
+    @objc private func toggleCustomDischargingNotification() {
+        let enabled = customDischargingNotificationCheckbox.state == .on
+        AppPreferences.customDischargingNotificationEnabled = enabled
+        customDischargingNotificationField.isEnabled = enabled
+        customDischargingNotificationStepper.isEnabled = enabled
+        requestNotificationAuthorizationIfNeeded()
+    }
+
+    @objc private func toggleCustomChargingNotification() {
+        let enabled = customChargingNotificationCheckbox.state == .on
+        AppPreferences.customChargingNotificationEnabled = enabled
+        customChargingNotificationField.isEnabled = enabled
+        customChargingNotificationStepper.isEnabled = enabled
+        requestNotificationAuthorizationIfNeeded()
+    }
+
+    @objc private func changeCustomDischargingNotification() {
+        commitCustomDischargingNotificationPercentage()
+    }
+
+    @objc private func stepCustomDischargingNotification() {
+        customDischargingNotificationField.integerValue =
+            customDischargingNotificationStepper.integerValue
+        commitCustomDischargingNotificationPercentage()
+    }
+
+    @objc private func changeCustomChargingNotification() {
+        commitCustomChargingNotificationPercentage()
+    }
+
+    @objc private func stepCustomChargingNotification() {
+        customChargingNotificationField.integerValue =
+            customChargingNotificationStepper.integerValue
+        commitCustomChargingNotificationPercentage()
+    }
+
+    func controlTextDidEndEditing(_ notification: Notification) {
+        guard let field = notification.object as? NSTextField else { return }
+        if field === customDischargingNotificationField {
+            commitCustomDischargingNotificationPercentage()
+        } else if field === customChargingNotificationField {
+            commitCustomChargingNotificationPercentage()
+        }
+    }
+
+    private func commitCustomDischargingNotificationPercentage() {
+        let percentage = min(
+            max(customDischargingNotificationField.integerValue, 1),
+            100
+        )
+        customDischargingNotificationField.integerValue = percentage
+        customDischargingNotificationStepper.integerValue = percentage
+        AppPreferences.customDischargingNotificationPercentage = percentage
+    }
+
+    private func commitCustomChargingNotificationPercentage() {
+        let percentage = min(
+            max(customChargingNotificationField.integerValue, 1),
+            100
+        )
+        customChargingNotificationField.integerValue = percentage
+        customChargingNotificationStepper.integerValue = percentage
+        AppPreferences.customChargingNotificationPercentage = percentage
     }
 
     @objc private func openBatteryCycleSupport() {
@@ -494,6 +866,10 @@ final class SettingsWindowController:
         selectPane(.general)
     }
 
+    @objc private func selectNotificationsPane() {
+        selectPane(.notifications)
+    }
+
     @objc private func selectBatteryHealthPane() {
         selectPane(.batteryHealth)
     }
@@ -537,9 +913,14 @@ final class SettingsWindowController:
             accessibilityDescription: pane.title
         )
         item.target = self
-        item.action = pane == .general
-            ? #selector(selectGeneralPane)
-            : #selector(selectBatteryHealthPane)
+        switch pane {
+        case .general:
+            item.action = #selector(selectGeneralPane)
+        case .notifications:
+            item.action = #selector(selectNotificationsPane)
+        case .batteryHealth:
+            item.action = #selector(selectBatteryHealthPane)
+        }
         return item
     }
 

@@ -102,6 +102,7 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
     private let reader = BatteryReader()
     private let updaterController: SPUStandardUpdaterController?
     private let batteryHealthCache = BatteryHealthCache()
+    private let notificationManager = BatteryNotificationManager()
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let powerSourceItem = NSMenuItem(
         title: "Reading Battery…",
@@ -136,6 +137,7 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
     }
 
     func start() {
+        notificationManager.start()
         configureStatusItem()
         configurePowerSourceNotifications()
         NotificationCenter.default.addObserver(
@@ -313,6 +315,7 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
 
         lastSuccessfulRefreshUptime = ProcessInfo.processInfo.systemUptime
         updateSafetyRefreshTimer(for: snapshot)
+        notificationManager.process(snapshot: snapshot)
 
         let hidesPercentSymbol = AppPreferences.hidesPercentSymbol
         let title = Self.percentageTitle(
@@ -451,7 +454,8 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
             controller = existingController
         } else {
             controller = SettingsWindowController(
-                batteryHealthCache: batteryHealthCache
+                batteryHealthCache: batteryHealthCache,
+                notificationManager: notificationManager
             )
             controller.onClose = { [weak self, weak controller] in
                 guard self?.settingsWindowController === controller else {

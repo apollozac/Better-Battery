@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.7.0
+
+- Adds configurable battery notifications with independent presets and custom
+  levels for charging and draining.
+- Defaults to an alert when battery power drops to 20% and when charging
+  reaches 80%, without firing either alert in the opposite direction.
+- Adds guidance for hiding Apple’s battery indicator when using Better Battery
+  as its replacement.
+
 ## 1.6.4
 
 - Centers the percentage precisely against the battery icon across left,

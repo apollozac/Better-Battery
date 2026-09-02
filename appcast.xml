@@ -3,6 +3,15 @@
     <channel>
         <title>Better Battery</title>
         <item>
+            <title>1.7.0</title>
+            <pubDate>Tue, 01 Sep 2026 22:08:35 -0500</pubDate>
+            <link>https://apollozac.com/better-battery</link>
+            <sparkle:version>46</sparkle:version>
+            <sparkle:shortVersionString>1.7.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.7.0/Better-Battery.zip" length="2972657" type="application/octet-stream" sparkle:edSignature="PGCRjLWhEyJ/ur8Bjd56Ohl87vgArcOI8jd8/yoaZi8fVtEuYRcyI9yEl9zWsF7bhzTFZUwBHU9dMkXi/O4BBg=="/>
+        </item>
+        <item>
             <title>1.6.4</title>
             <pubDate>Wed, 26 Aug 2026 13:37:59 -0500</pubDate>
             <link>https://apollozac.com/better-battery</link>
@@ -19,15 +28,6 @@
             <sparkle:shortVersionString>1.6.3</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
             <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.6.3/Better-Battery.zip" length="2941175" type="application/octet-stream" sparkle:edSignature="U2vaF+G/vGIJMpjXKKt4X2U8lPDTXR/os5rWdMTBAoolOrx/YV3U1n0O5aoA9xDnrjB7qh1/gx8FBLkfl2XGDw=="/>
-        </item>
-        <item>
-            <title>1.6.2</title>
-            <pubDate>Tue, 25 Aug 2026 10:39:14 -0500</pubDate>
-            <link>https://apollozac.com/better-battery</link>
-            <sparkle:version>43</sparkle:version>
-            <sparkle:shortVersionString>1.6.2</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.6.2/Better-Battery.zip" length="2940996" type="application/octet-stream" sparkle:edSignature="ev+wi+++qKneoFHCBvKT1wQpUiV8V2SXGS4LtGMXi2GsJrV2G97Do/GepBQx9rFBOkI4iFQVQ3N+CHOJnbRRBA=="/>
         </item>
     </channel>
 </rss>

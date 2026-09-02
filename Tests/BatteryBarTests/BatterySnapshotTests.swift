@@ -489,12 +489,20 @@ final class BatterySnapshotTests: XCTestCase {
     func testSettingsPanesHaveStableTitlesAndSymbols() {
         XCTAssertEqual(
             BetterBatterySettingsPane.allCases,
-            [.general, .batteryHealth]
+            [.general, .notifications, .batteryHealth]
         )
         XCTAssertEqual(BetterBatterySettingsPane.general.title, "General")
         XCTAssertEqual(
             BetterBatterySettingsPane.general.symbolName,
             "gearshape"
+        )
+        XCTAssertEqual(
+            BetterBatterySettingsPane.notifications.title,
+            "Notifications"
+        )
+        XCTAssertEqual(
+            BetterBatterySettingsPane.notifications.symbolName,
+            "bell"
         )
         XCTAssertEqual(
             BetterBatterySettingsPane.batteryHealth.title,
@@ -507,6 +515,169 @@ final class BatterySnapshotTests: XCTestCase {
         XCTAssertEqual(
             SettingsWindowController.batteryCycleSupportURL.absoluteString,
             "https://support.apple.com/en-us/102888"
+        )
+        XCTAssertEqual(
+            SettingsWindowController.systemBatteryGuidance,
+            "Hide Apple’s battery by Command-dragging it out of the menu bar, " +
+                "or unchecking Battery in System Settings › Menu Bar."
+        )
+    }
+
+    func testNotificationPolicyFindsDischargingThreshold() {
+        XCTAssertEqual(
+            AppPreferences.standardNotificationThresholds,
+            [1, 5, 10, 20, 50, 80, 100]
+        )
+        XCTAssertEqual(
+            AppPreferences.defaultDischargingNotificationThresholds,
+            [20]
+        )
+        XCTAssertEqual(
+            AppPreferences.defaultChargingNotificationThresholds,
+            [80]
+        )
+
+        let snapshot = BatterySnapshot(
+            percentage: 20,
+            isCharging: false,
+            isConnectedToPower: false,
+            minutesRemaining: 75
+        )
+
+        XCTAssertEqual(
+            BatteryNotificationPolicy.event(
+                previousPercentage: 21,
+                snapshot: snapshot,
+                chargingThresholds: [80],
+                dischargingThresholds: [10, 20, 50]
+            ),
+            BatteryNotificationEvent(
+                threshold: 20,
+                percentage: 20,
+                direction: .discharging
+            )
+        )
+    }
+
+    func testNotificationPolicyFindsChargingThreshold() {
+        let snapshot = BatterySnapshot(
+            percentage: 80,
+            isCharging: true,
+            isConnectedToPower: true,
+            minutesRemaining: nil,
+            minutesToFull: 25
+        )
+
+        XCTAssertEqual(
+            BatteryNotificationPolicy.event(
+                previousPercentage: 79,
+                snapshot: snapshot,
+                chargingThresholds: [50, 80, 100],
+                dischargingThresholds: [20]
+            ),
+            BatteryNotificationEvent(
+                threshold: 80,
+                percentage: 80,
+                direction: .charging
+            )
+        )
+    }
+
+    func testNotificationPolicyAvoidsStaleAndWrongDirectionAlerts() {
+        let unchanged = BatterySnapshot(
+            percentage: 20,
+            isCharging: false,
+            isConnectedToPower: false,
+            minutesRemaining: 75
+        )
+        XCTAssertNil(
+            BatteryNotificationPolicy.event(
+                previousPercentage: 20,
+                snapshot: unchanged,
+                chargingThresholds: [80],
+                dischargingThresholds: [20]
+            )
+        )
+
+        let connectedButFalling = BatterySnapshot(
+            percentage: 19,
+            isCharging: false,
+            isConnectedToPower: true,
+            minutesRemaining: nil
+        )
+        XCTAssertNil(
+            BatteryNotificationPolicy.event(
+                previousPercentage: 21,
+                snapshot: connectedButFalling,
+                chargingThresholds: [20],
+                dischargingThresholds: [20]
+            )
+        )
+    }
+
+    func testNotificationPolicyChoosesMostRelevantSkippedThreshold() {
+        let discharging = BatterySnapshot(
+            percentage: 4,
+            isCharging: false,
+            isConnectedToPower: false,
+            minutesRemaining: 10
+        )
+        XCTAssertEqual(
+            BatteryNotificationPolicy.event(
+                previousPercentage: 25,
+                snapshot: discharging,
+                chargingThresholds: [80],
+                dischargingThresholds: [5, 10, 20]
+            )?.threshold,
+            5
+        )
+
+        let charging = BatterySnapshot(
+            percentage: 85,
+            isCharging: true,
+            isConnectedToPower: true,
+            minutesRemaining: nil
+        )
+        XCTAssertEqual(
+            BatteryNotificationPolicy.event(
+                previousPercentage: 45,
+                snapshot: charging,
+                chargingThresholds: [50, 80, 100],
+                dischargingThresholds: [20]
+            )?.threshold,
+            80
+        )
+    }
+
+    func testNotificationPolicyKeepsDirectionsIndependent() {
+        let chargingToTwenty = BatterySnapshot(
+            percentage: 20,
+            isCharging: true,
+            isConnectedToPower: true,
+            minutesRemaining: nil
+        )
+        XCTAssertNil(
+            BatteryNotificationPolicy.event(
+                previousPercentage: 19,
+                snapshot: chargingToTwenty,
+                chargingThresholds: [80],
+                dischargingThresholds: [20]
+            )
+        )
+
+        let dischargingToEighty = BatterySnapshot(
+            percentage: 80,
+            isCharging: false,
+            isConnectedToPower: false,
+            minutesRemaining: 240
+        )
+        XCTAssertNil(
+            BatteryNotificationPolicy.event(
+                previousPercentage: 81,
+                snapshot: dischargingToEighty,
+                chargingThresholds: [80],
+                dischargingThresholds: [20]
+            )
         )
     }
 

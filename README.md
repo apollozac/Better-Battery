@@ -26,6 +26,8 @@ signed and notarized by Apple.
 - Shows charging and external-power states.
 - Offers a percentage-only mode designed to sit beside Apple's battery icon.
 - Displays battery condition, maximum capacity, and cycle count in Settings.
+- Offers independent charging and draining alerts at preset or custom battery
+  levels.
 - Can open automatically when you log in.
 - Checks for signed updates and can install them automatically.
 - Uses native macOS power notifications with a low-frequency safety refresh.
@@ -65,7 +67,7 @@ After uploading the ZIP to a GitHub release, generate the signed Sparkle feed
 for that version with:
 
 ```sh
-./script/generate_appcast.sh 1.6.4
+./script/generate_appcast.sh 1.7.0
 ```
 
 ## Privacy

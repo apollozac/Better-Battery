@@ -26,6 +26,7 @@ let package = Package(
                 .linkedFramework("AppKit"),
                 .linkedFramework("IOKit"),
                 .linkedFramework("ServiceManagement"),
+                .linkedFramework("UserNotifications"),
                 .unsafeFlags([
                     "-Xlinker", "-rpath",
                     "-Xlinker", "@executable_path/../Frameworks"

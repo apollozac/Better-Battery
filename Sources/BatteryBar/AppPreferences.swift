@@ -50,6 +50,22 @@ enum AppPreferences {
     private static let percentagePositionDefaultsKey = "PercentagePosition"
     private static let appliedOpenAtLoginDefaultDefaultsKey =
         "AppliedOpenAtLoginDefault"
+    private static let dischargingNotificationThresholdsDefaultsKey =
+        "DischargingNotificationThresholds"
+    private static let chargingNotificationThresholdsDefaultsKey =
+        "ChargingNotificationThresholds"
+    private static let customDischargingNotificationEnabledDefaultsKey =
+        "CustomDischargingNotificationEnabled"
+    private static let customDischargingNotificationPercentageDefaultsKey =
+        "CustomDischargingNotificationPercentage"
+    private static let customChargingNotificationEnabledDefaultsKey =
+        "CustomChargingNotificationEnabled"
+    private static let customChargingNotificationPercentageDefaultsKey =
+        "CustomChargingNotificationPercentage"
+
+    static let standardNotificationThresholds = [1, 5, 10, 20, 50, 80, 100]
+    static let defaultDischargingNotificationThresholds: Set<Int> = [20]
+    static let defaultChargingNotificationThresholds: Set<Int> = [80]
 
     static let displayModeDidChangeNotification = Notification.Name(
         "BetterBatteryDisplayModeDidChange"
@@ -167,5 +183,118 @@ enum AppPreferences {
                 forKey: appliedOpenAtLoginDefaultDefaultsKey
             )
         }
+    }
+
+    static var dischargingNotificationThresholds: Set<Int> {
+        get {
+            guard let values = UserDefaults.standard.array(
+                forKey: dischargingNotificationThresholdsDefaultsKey
+            ) as? [Int] else {
+                return defaultDischargingNotificationThresholds
+            }
+            return Set(values.filter { (1...100).contains($0) })
+        }
+        set {
+            UserDefaults.standard.set(
+                newValue.sorted(),
+                forKey: dischargingNotificationThresholdsDefaultsKey
+            )
+        }
+    }
+
+    static var chargingNotificationThresholds: Set<Int> {
+        get {
+            guard let values = UserDefaults.standard.array(
+                forKey: chargingNotificationThresholdsDefaultsKey
+            ) as? [Int] else {
+                return defaultChargingNotificationThresholds
+            }
+            return Set(values.filter { (1...100).contains($0) })
+        }
+        set {
+            UserDefaults.standard.set(
+                newValue.sorted(),
+                forKey: chargingNotificationThresholdsDefaultsKey
+            )
+        }
+    }
+
+    static var customDischargingNotificationEnabled: Bool {
+        get {
+            UserDefaults.standard.bool(
+                forKey: customDischargingNotificationEnabledDefaultsKey
+            )
+        }
+        set {
+            UserDefaults.standard.set(
+                newValue,
+                forKey: customDischargingNotificationEnabledDefaultsKey
+            )
+        }
+    }
+
+    static var customDischargingNotificationPercentage: Int {
+        get {
+            let value = UserDefaults.standard.integer(
+                forKey: customDischargingNotificationPercentageDefaultsKey
+            )
+            return (1...100).contains(value) ? value : 30
+        }
+        set {
+            UserDefaults.standard.set(
+                min(max(newValue, 1), 100),
+                forKey: customDischargingNotificationPercentageDefaultsKey
+            )
+        }
+    }
+
+    static var customChargingNotificationEnabled: Bool {
+        get {
+            UserDefaults.standard.bool(
+                forKey: customChargingNotificationEnabledDefaultsKey
+            )
+        }
+        set {
+            UserDefaults.standard.set(
+                newValue,
+                forKey: customChargingNotificationEnabledDefaultsKey
+            )
+        }
+    }
+
+    static var customChargingNotificationPercentage: Int {
+        get {
+            let value = UserDefaults.standard.integer(
+                forKey: customChargingNotificationPercentageDefaultsKey
+            )
+            return (1...100).contains(value) ? value : 90
+        }
+        set {
+            UserDefaults.standard.set(
+                min(max(newValue, 1), 100),
+                forKey: customChargingNotificationPercentageDefaultsKey
+            )
+        }
+    }
+
+    static var allDischargingNotificationThresholds: Set<Int> {
+        var thresholds = dischargingNotificationThresholds
+        if customDischargingNotificationEnabled {
+            thresholds.insert(customDischargingNotificationPercentage)
+        }
+        return thresholds
+    }
+
+    static var allChargingNotificationThresholds: Set<Int> {
+        var thresholds = chargingNotificationThresholds
+        if customChargingNotificationEnabled {
+            thresholds.insert(customChargingNotificationPercentage)
+        }
+        return thresholds
+    }
+
+    static var hasAnyNotificationThreshold: Bool {
+        !allDischargingNotificationThresholds.isEmpty ||
+            !allChargingNotificationThresholds.isEmpty
     }
 }
