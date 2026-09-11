@@ -2,7 +2,7 @@
 
 ## Name
 
-Better Battery
+Better Battery for macOS
 
 ## Subtitle
 
