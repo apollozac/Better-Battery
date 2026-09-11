@@ -1,4 +1,7 @@
 import Foundation
+#if APP_STORE
+import IOKit
+#endif
 
 struct BatteryHealthSnapshot: Equatable {
     let condition: String?
@@ -8,6 +11,27 @@ struct BatteryHealthSnapshot: Equatable {
 
 struct BatteryHealthReader {
     func currentSnapshot() -> BatteryHealthSnapshot? {
+#if APP_STORE
+        guard let properties = Self.smartBatteryProperties() else {
+            return nil
+        }
+
+        let batteryData = properties["BatteryData"] as? [String: Any]
+        let condition = properties["BatteryHealth"] as? String
+        let cycleCount = Self.integer(
+            properties["CycleCount"] ?? batteryData?["CycleCount"]
+        )
+
+        guard condition != nil || cycleCount != nil else {
+            return nil
+        }
+
+        return BatteryHealthSnapshot(
+            condition: condition,
+            maximumCapacity: nil,
+            cycleCount: cycleCount
+        )
+#else
         let process = Process()
         let output = Pipe()
 
@@ -29,7 +53,44 @@ struct BatteryHealthReader {
         }
 
         return Self.parse(data: data)
+#endif
     }
+
+#if APP_STORE
+    private static func smartBatteryProperties() -> [String: Any]? {
+        let service = IOServiceGetMatchingService(
+            kIOMainPortDefault,
+            IOServiceMatching("AppleSmartBattery")
+        )
+        guard service != IO_OBJECT_NULL else {
+            return nil
+        }
+        defer { IOObjectRelease(service) }
+
+        var unmanagedProperties: Unmanaged<CFMutableDictionary>?
+        let result = IORegistryEntryCreateCFProperties(
+            service,
+            &unmanagedProperties,
+            kCFAllocatorDefault,
+            0
+        )
+        guard
+            result == KERN_SUCCESS,
+            let properties = unmanagedProperties?.takeRetainedValue()
+                as? [String: Any]
+        else {
+            return nil
+        }
+        return properties
+    }
+
+    private static func integer(_ value: Any?) -> Int? {
+        if let number = value as? NSNumber {
+            return number.intValue
+        }
+        return value as? Int
+    }
+#endif
 
     static func parse(data: Data) -> BatteryHealthSnapshot? {
         guard

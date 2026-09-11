@@ -468,6 +468,14 @@ final class SettingsWindowController:
     private func makeBatteryHealthView() -> NSView {
         let view = NSView()
 
+#if APP_STORE
+        let grid = NSGridView(views: [
+            [
+                Self.makeRowLabel("Cycle Count"),
+                cycleCountValueLabel
+            ]
+        ])
+#else
         let grid = NSGridView(views: [
             [
                 Self.makeRowLabel("Condition"),
@@ -482,6 +490,7 @@ final class SettingsWindowController:
                 cycleCountValueLabel
             ]
         ])
+#endif
         grid.translatesAutoresizingMaskIntoConstraints = false
         grid.columnSpacing = 28
         grid.rowSpacing = 18

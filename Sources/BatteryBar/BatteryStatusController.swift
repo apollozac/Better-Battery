@@ -1,6 +1,8 @@
 import AppKit
 import IOKit.ps
+#if !APP_STORE
 import Sparkle
+#endif
 
 private func batteryPowerSourceDidChange(_ context: UnsafeMutableRawPointer?) {
     guard let context else {
@@ -100,7 +102,9 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
     static let percentageBatteryAlignmentOffset: CGFloat = -0.75
 
     private let reader = BatteryReader()
+#if !APP_STORE
     private let updaterController: SPUStandardUpdaterController?
+#endif
     private let batteryHealthCache = BatteryHealthCache()
     private let notificationManager = BatteryNotificationManager()
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -131,10 +135,16 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
     private var isShowingUnavailableStatus = false
     private var lastSuccessfulRefreshUptime: TimeInterval?
 
+#if APP_STORE
+    override init() {
+        super.init()
+    }
+#else
     init(updaterController: SPUStandardUpdaterController? = nil) {
         self.updaterController = updaterController
         super.init()
     }
+#endif
 
     func start() {
         notificationManager.start()
@@ -191,6 +201,7 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
         menu.addItem(powerSourceItem)
         menu.addItem(timeItem)
         menu.addItem(.separator())
+#if !APP_STORE
         if let updaterController {
             let updateItem = NSMenuItem(
                 title: "Check for Updates…",
@@ -200,6 +211,7 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
             updateItem.target = updaterController
             menu.addItem(updateItem)
         }
+#endif
         menu.addItem(settingsItem)
         menu.addItem(.separator())
 

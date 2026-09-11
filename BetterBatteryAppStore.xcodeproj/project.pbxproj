@@ -1,0 +1,263 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000001 /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* AppPreferences.swift */; };
+		A10000000000000000000002 /* BatteryHealthReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* BatteryHealthReader.swift */; };
+		A10000000000000000000003 /* BatteryIconRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* BatteryIconRenderer.swift */; };
+		A10000000000000000000004 /* BatteryNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000004 /* BatteryNotificationManager.swift */; };
+		A10000000000000000000005 /* BatteryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000005 /* BatteryReader.swift */; };
+		A10000000000000000000006 /* BatterySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* BatterySnapshot.swift */; };
+		A10000000000000000000007 /* BatteryStatusController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000007 /* BatteryStatusController.swift */; };
+		A10000000000000000000008 /* BetterBatteryApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* BetterBatteryApp.swift */; };
+		A10000000000000000000009 /* LoginItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* LoginItemManager.swift */; };
+		A1000000000000000000000A /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000A /* SettingsWindowController.swift */; };
+		A1000000000000000000000B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000D /* PrivacyInfo.xcprivacy */; };
+		A1000000000000000000000C /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000E /* AppKit.framework */; };
+		A1000000000000000000000D /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000F /* IOKit.framework */; };
+		A1000000000000000000000E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20000000000000000000010 /* ServiceManagement.framework */; };
+		A1000000000000000000000F /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20000000000000000000011 /* UserNotifications.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A20000000000000000000001 /* AppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferences.swift; sourceTree = "<group>"; };
+		A20000000000000000000002 /* BatteryHealthReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryHealthReader.swift; sourceTree = "<group>"; };
+		A20000000000000000000003 /* BatteryIconRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryIconRenderer.swift; sourceTree = "<group>"; };
+		A20000000000000000000004 /* BatteryNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryNotificationManager.swift; sourceTree = "<group>"; };
+		A20000000000000000000005 /* BatteryReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryReader.swift; sourceTree = "<group>"; };
+		A20000000000000000000006 /* BatterySnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatterySnapshot.swift; sourceTree = "<group>"; };
+		A20000000000000000000007 /* BatteryStatusController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryStatusController.swift; sourceTree = "<group>"; };
+		A20000000000000000000008 /* BetterBatteryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BetterBatteryApp.swift; sourceTree = "<group>"; };
+		A20000000000000000000009 /* LoginItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemManager.swift; sourceTree = "<group>"; };
+		A2000000000000000000000A /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
+		A2000000000000000000000B /* AppStore-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AppStore-Info.plist"; sourceTree = "<group>"; };
+		A2000000000000000000000C /* BetterBattery.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BetterBattery.entitlements; sourceTree = "<group>"; };
+		A2000000000000000000000D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A2000000000000000000000E /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		A2000000000000000000000F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		A20000000000000000000010 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
+		A20000000000000000000011 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		A20000000000000000000012 /* Better Battery.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Better Battery.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A30000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000000000000000000000C /* AppKit.framework in Frameworks */,
+				A1000000000000000000000D /* IOKit.framework in Frameworks */,
+				A1000000000000000000000E /* ServiceManagement.framework in Frameworks */,
+				A1000000000000000000000F /* UserNotifications.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A40000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				A40000000000000000000002 /* Sources */,
+				A40000000000000000000003 /* AppStore */,
+				A40000000000000000000004 /* Frameworks */,
+				A40000000000000000000005 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A40000000000000000000002 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000001 /* AppPreferences.swift */,
+				A20000000000000000000002 /* BatteryHealthReader.swift */,
+				A20000000000000000000003 /* BatteryIconRenderer.swift */,
+				A20000000000000000000004 /* BatteryNotificationManager.swift */,
+				A20000000000000000000005 /* BatteryReader.swift */,
+				A20000000000000000000006 /* BatterySnapshot.swift */,
+				A20000000000000000000007 /* BatteryStatusController.swift */,
+				A20000000000000000000008 /* BetterBatteryApp.swift */,
+				A20000000000000000000009 /* LoginItemManager.swift */,
+				A2000000000000000000000A /* SettingsWindowController.swift */,
+			);
+			name = Sources;
+			path = Sources/BatteryBar;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000003 /* AppStore */ = {
+			isa = PBXGroup;
+			children = (
+				A2000000000000000000000B /* AppStore-Info.plist */,
+				A2000000000000000000000C /* BetterBattery.entitlements */,
+				A2000000000000000000000D /* PrivacyInfo.xcprivacy */,
+			);
+			path = AppStore;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000004 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A2000000000000000000000E /* AppKit.framework */,
+				A2000000000000000000000F /* IOKit.framework */,
+				A20000000000000000000010 /* ServiceManagement.framework */,
+				A20000000000000000000011 /* UserNotifications.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000005 /* Products */ = {
+			isa = PBXGroup;
+			children = (A20000000000000000000012 /* Better Battery.app */,);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A50000000000000000000001 /* BetterBatteryAppStore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A90000000000000000000002 /* Build configuration list for PBXNativeTarget */;
+			buildPhases = (
+				A30000000000000000000002 /* Sources */,
+				A30000000000000000000001 /* Frameworks */,
+				A30000000000000000000003 /* Resources */,
+				A30000000000000000000004 /* Compile App Icon */,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = BetterBatteryAppStore;
+			productName = BetterBattery;
+			productReference = A20000000000000000000012 /* Better Battery.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A60000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = { A50000000000000000000001 = { CreatedOnToolsVersion = 27.0; }; };
+			};
+			buildConfigurationList = A90000000000000000000001 /* Build configuration list for PBXProject */;
+			compatibilityVersion = "Xcode 16.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base);
+			mainGroup = A40000000000000000000001;
+			productRefGroup = A40000000000000000000005 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (A50000000000000000000001 /* BetterBatteryAppStore */,);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A30000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (A1000000000000000000000B /* PrivacyInfo.xcprivacy in Resources */,);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A30000000000000000000004 /* Compile App Icon */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = ();
+			inputPaths = ("$(SRCROOT)/Resources/AppIcon.icon",);
+			name = "Compile App Icon";
+			outputPaths = ("$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AppIcon.icns", "$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Assets.car",);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/script/compile_app_icon.sh\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\" \"$PRODUCT_BUNDLE_IDENTIFIER\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A30000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000001 /* AppPreferences.swift in Sources */,
+				A10000000000000000000002 /* BatteryHealthReader.swift in Sources */,
+				A10000000000000000000003 /* BatteryIconRenderer.swift in Sources */,
+				A10000000000000000000004 /* BatteryNotificationManager.swift in Sources */,
+				A10000000000000000000005 /* BatteryReader.swift in Sources */,
+				A10000000000000000000006 /* BatterySnapshot.swift in Sources */,
+				A10000000000000000000007 /* BatteryStatusController.swift in Sources */,
+				A10000000000000000000008 /* BetterBatteryApp.swift in Sources */,
+				A10000000000000000000009 /* LoginItemManager.swift in Sources */,
+				A1000000000000000000000A /* SettingsWindowController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A80000000000000000000001 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; MACOSX_DEPLOYMENT_TARGET = 27.0; SDKROOT = macosx; SWIFT_VERSION = 5.0;}; name = Debug;};
+		A80000000000000000000002 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; MACOSX_DEPLOYMENT_TARGET = 27.0; SDKROOT = macosx; SWIFT_VERSION = 5.0;}; name = Release;};
+		A80000000000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CODE_SIGN_ENTITLEMENTS = AppStore/BetterBattery.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 47;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = XWKP9KZ69G;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AppStore/AppStore-Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.7.0;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.apollozac.BetterBattery;
+				EXECUTABLE_NAME = BetterBattery;
+				PRODUCT_NAME = "Better Battery";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "APP_STORE DEBUG";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A80000000000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CODE_SIGN_ENTITLEMENTS = AppStore/BetterBattery.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 47;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = XWKP9KZ69G;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AppStore/AppStore-Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.7.0;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.apollozac.BetterBattery;
+				EXECUTABLE_NAME = BetterBattery;
+				PRODUCT_NAME = "Better Battery";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = APP_STORE;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A90000000000000000000001 /* Build configuration list for PBXProject */ = {isa = XCConfigurationList; buildConfigurations = (A80000000000000000000001 /* Debug */, A80000000000000000000002 /* Release */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;};
+		A90000000000000000000002 /* Build configuration list for PBXNativeTarget */ = {isa = XCConfigurationList; buildConfigurations = (A80000000000000000000003 /* Debug */, A80000000000000000000004 /* Release */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;};
+/* End XCConfigurationList section */
+	};
+	rootObject = A60000000000000000000001 /* Project object */;
+}
