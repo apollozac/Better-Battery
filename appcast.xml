@@ -3,6 +3,15 @@
     <channel>
         <title>Better Battery</title>
         <item>
+            <title>1.7.1</title>
+            <pubDate>Fri, 09 Oct 2026 16:12:35 -0500</pubDate>
+            <link>https://apollozac.com/better-battery</link>
+            <sparkle:version>49</sparkle:version>
+            <sparkle:shortVersionString>1.7.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.7.1/Better-Battery.zip" length="2983669" type="application/octet-stream" sparkle:edSignature="ptbzaWS5Vc7sHh1Ea0Xd7rIGR9Q7xCqUpHLauU2e9NaYwfokQxxNsYjpNCzUNGkSVtCZ/ynm29JN/y1E9DzCDQ=="/>
+        </item>
+        <item>
             <title>1.7.0</title>
             <pubDate>Tue, 01 Sep 2026 22:08:35 -0500</pubDate>
             <link>https://apollozac.com/better-battery</link>
@@ -19,15 +28,6 @@
             <sparkle:shortVersionString>1.6.4</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
             <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.6.4/Better-Battery.zip" length="2941534" type="application/octet-stream" sparkle:edSignature="mZT5nGGhXVVyRxt5DhohReGpl5DnMhwxoydN7rXx5maSpw1n0Hl4x8kotQNpEonoFs6IE85YZYFonGaeWTo4DA=="/>
-        </item>
-        <item>
-            <title>1.6.3</title>
-            <pubDate>Tue, 25 Aug 2026 11:43:07 -0500</pubDate>
-            <link>https://apollozac.com/better-battery</link>
-            <sparkle:version>44</sparkle:version>
-            <sparkle:shortVersionString>1.6.3</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/apollozac/Better-Battery/releases/download/v1.6.3/Better-Battery.zip" length="2941175" type="application/octet-stream" sparkle:edSignature="U2vaF+G/vGIJMpjXKKt4X2U8lPDTXR/os5rWdMTBAoolOrx/YV3U1n0O5aoA9xDnrjB7qh1/gx8FBLkfl2XGDw=="/>
         </item>
     </channel>
 </rss>
