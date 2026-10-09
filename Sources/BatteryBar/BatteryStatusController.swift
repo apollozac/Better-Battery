@@ -328,6 +328,7 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
         lastSuccessfulRefreshUptime = ProcessInfo.processInfo.systemUptime
         updateSafetyRefreshTimer(for: snapshot)
         notificationManager.process(snapshot: snapshot)
+        statusItem.button?.toolTip = snapshot.hoverDescription
 
         let hidesPercentSymbol = AppPreferences.hidesPercentSymbol
         let title = Self.percentageTitle(
@@ -354,8 +355,6 @@ final class BatteryStatusController: NSObject, NSMenuDelegate {
                     batteryDesign: presentation.batteryDesign
                 )
             statusItem.button?.title = title
-            statusItem.button?.toolTip =
-                "\(presentation.percentage)% — \(presentation.stateDescription)"
             updateStatusItemLayout(
                 for: title,
                 showsPercentageOnly: presentation.showsPercentageOnly,

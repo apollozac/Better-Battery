@@ -66,6 +66,12 @@ struct BatterySnapshot: Equatable {
         return "\(Self.formattedDuration(minutes: minutesRemaining)) remaining"
     }
 
+    var hoverDescription: String {
+        var lines = ["\(percentage)% — \(stateDescription)", "Power Source: \(powerSourceDescription)"]
+        if let timeDescription { lines.append(timeDescription) }
+        return lines.joined(separator: "\n")
+    }
+
     private static func formattedDuration(minutes totalMinutes: Int) -> String {
         let hours = totalMinutes / 60
         let minutes = totalMinutes % 60

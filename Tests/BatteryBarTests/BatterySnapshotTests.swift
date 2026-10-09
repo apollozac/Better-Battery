@@ -525,8 +525,12 @@ final class BatterySnapshotTests: XCTestCase {
 
     func testNotificationPolicyFindsDischargingThreshold() {
         XCTAssertEqual(
-            AppPreferences.standardNotificationThresholds,
-            [1, 5, 10, 20, 50, 80, 100]
+            AppPreferences.dischargingNotificationPresets,
+            [1, 5, 10, 20, 50, 80]
+        )
+        XCTAssertEqual(
+            AppPreferences.chargingNotificationPresets,
+            [5, 10, 20, 50, 80, 100]
         )
         XCTAssertEqual(
             AppPreferences.defaultDischargingNotificationThresholds,

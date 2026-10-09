@@ -86,7 +86,7 @@ final class BatteryNotificationManager: NSObject,
     UNUserNotificationCenterDelegate
 {
     private let center: UNUserNotificationCenter
-    private var previousPercentage: Int?
+    private var tracker = BatteryNotificationTracker()
 
     init(center: UNUserNotificationCenter = .current()) {
         self.center = center
@@ -98,22 +98,11 @@ final class BatteryNotificationManager: NSObject,
     }
 
     func process(snapshot: BatterySnapshot) {
-        defer {
-            previousPercentage = snapshot.percentage
-        }
-        guard
-            let previousPercentage,
-            let event = BatteryNotificationPolicy.event(
-                previousPercentage: previousPercentage,
-                snapshot: snapshot,
-                chargingThresholds:
-                    AppPreferences.allChargingNotificationThresholds,
-                dischargingThresholds:
-                    AppPreferences.allDischargingNotificationThresholds
-            )
-        else {
-            return
-        }
+        guard let event = tracker.process(
+            snapshot: snapshot,
+            chargingThresholds: AppPreferences.allChargingNotificationThresholds,
+            dischargingThresholds: AppPreferences.allDischargingNotificationThresholds
+        ) else { return }
 
         center.getNotificationSettings { [weak self] settings in
             guard settings.authorizationStatus == .authorized ||
@@ -133,6 +122,24 @@ final class BatteryNotificationManager: NSObject,
             _ in
             DispatchQueue.main.async {
                 completion(granted)
+            }
+        }
+    }
+
+    func sendTestNotification(completion: @escaping (String) -> Void) {
+        requestAuthorization { [weak self] granted in
+            guard granted, let self else {
+                completion("Allow notifications in System Settings, then try again.")
+                return
+            }
+            let content = UNMutableNotificationContent()
+            content.title = "Better Battery Test"
+            content.body = "Battery alerts are ready. Your selected levels will notify you here."
+            content.sound = .default
+            self.center.add(UNNotificationRequest(identifier: "battery-test", content: content, trigger: nil)) { error in
+                let message = error.map { "Could not send notification: \($0.localizedDescription)" }
+                    ?? "Test sent. Banner visibility and sound follow your macOS notification and Focus settings."
+                DispatchQueue.main.async { completion(message) }
             }
         }
     }
@@ -167,5 +174,27 @@ final class BatteryNotificationManager: NSObject,
         willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
         [.banner, .sound]
+    }
+}
+
+/// First readings and power-source changes establish a baseline. Subsequent
+/// readings notify on every crossing, including thresholds crossed while asleep.
+struct BatteryNotificationTracker {
+    private var previous: BatterySnapshot?
+
+    mutating func process(
+        snapshot: BatterySnapshot,
+        chargingThresholds: Set<Int>,
+        dischargingThresholds: Set<Int>
+    ) -> BatteryNotificationEvent? {
+        defer { previous = snapshot }
+        guard let previous else { return nil }
+        guard previous.isConnectedToPower == snapshot.isConnectedToPower else {
+            return nil
+        }
+        return BatteryNotificationPolicy.event(
+            previousPercentage: previous.percentage, snapshot: snapshot,
+            chargingThresholds: chargingThresholds, dischargingThresholds: dischargingThresholds
+        )
     }
 }

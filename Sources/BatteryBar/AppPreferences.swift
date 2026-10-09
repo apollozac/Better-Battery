@@ -63,7 +63,8 @@ enum AppPreferences {
     private static let customChargingNotificationPercentageDefaultsKey =
         "CustomChargingNotificationPercentage"
 
-    static let standardNotificationThresholds = [1, 5, 10, 20, 50, 80, 100]
+    static let dischargingNotificationPresets = [1, 5, 10, 20, 50, 80]
+    static let chargingNotificationPresets = [5, 10, 20, 50, 80, 100]
     static let defaultDischargingNotificationThresholds: Set<Int> = [20]
     static let defaultChargingNotificationThresholds: Set<Int> = [80]
 
@@ -192,11 +193,11 @@ enum AppPreferences {
             ) as? [Int] else {
                 return defaultDischargingNotificationThresholds
             }
-            return Set(values.filter { (1...100).contains($0) })
+            return Set(values).intersection(dischargingNotificationPresets)
         }
         set {
             UserDefaults.standard.set(
-                newValue.sorted(),
+                newValue.intersection(dischargingNotificationPresets).sorted(),
                 forKey: dischargingNotificationThresholdsDefaultsKey
             )
         }
@@ -209,11 +210,11 @@ enum AppPreferences {
             ) as? [Int] else {
                 return defaultChargingNotificationThresholds
             }
-            return Set(values.filter { (1...100).contains($0) })
+            return Set(values).intersection(chargingNotificationPresets)
         }
         set {
             UserDefaults.standard.set(
-                newValue.sorted(),
+                newValue.intersection(chargingNotificationPresets).sorted(),
                 forKey: chargingNotificationThresholdsDefaultsKey
             )
         }
@@ -278,7 +279,7 @@ enum AppPreferences {
     }
 
     static var allDischargingNotificationThresholds: Set<Int> {
-        var thresholds = dischargingNotificationThresholds
+        var thresholds = dischargingNotificationThresholds.union(additionalDischargingThresholds)
         if customDischargingNotificationEnabled {
             thresholds.insert(customDischargingNotificationPercentage)
         }
@@ -286,7 +287,7 @@ enum AppPreferences {
     }
 
     static var allChargingNotificationThresholds: Set<Int> {
-        var thresholds = chargingNotificationThresholds
+        var thresholds = chargingNotificationThresholds.union(additionalChargingThresholds)
         if customChargingNotificationEnabled {
             thresholds.insert(customChargingNotificationPercentage)
         }
@@ -296,5 +297,23 @@ enum AppPreferences {
     static var hasAnyNotificationThreshold: Bool {
         !allDischargingNotificationThresholds.isEmpty ||
             !allChargingNotificationThresholds.isEmpty
+    }
+
+    static func parseThresholds(_ text: String) -> Set<Int>? {
+        if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return [] }
+        let parts = text.split(separator: ",", omittingEmptySubsequences: false)
+        let values = parts.compactMap { Int($0.trimmingCharacters(in: .whitespacesAndNewlines)) }
+        guard values.count == parts.count, values.allSatisfy({ (1...100).contains($0) }) else { return nil }
+        return Set(values)
+    }
+
+    static var additionalDischargingThresholds: Set<Int> {
+        get { Set(UserDefaults.standard.array(forKey: "AdditionalDischargingThresholds") as? [Int] ?? []).filter { (1...100).contains($0) } }
+        set { UserDefaults.standard.set(newValue.filter { (1...100).contains($0) }.sorted(), forKey: "AdditionalDischargingThresholds") }
+    }
+
+    static var additionalChargingThresholds: Set<Int> {
+        get { Set(UserDefaults.standard.array(forKey: "AdditionalChargingThresholds") as? [Int] ?? []).filter { (1...100).contains($0) } }
+        set { UserDefaults.standard.set(newValue.filter { (1...100).contains($0) }.sorted(), forKey: "AdditionalChargingThresholds") }
     }
 }

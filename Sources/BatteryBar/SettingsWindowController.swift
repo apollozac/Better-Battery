@@ -1,6 +1,77 @@
 import AppKit
 
 @MainActor
+final class CustomBatteryAlertRow: NSStackView, NSTextFieldDelegate {
+    let checkbox = NSButton(checkboxWithTitle: "Custom", target: nil, action: nil)
+    let field = NSTextField(string: "")
+    private let stepper = NSStepper()
+    var onChange: (() -> Void)?
+    var level: Int { field.integerValue }
+    var isEnabled: Bool { checkbox.state == .on }
+
+    init(level: Int, enabled: Bool, direction: String) {
+        super.init(frame: .zero)
+        orientation = .horizontal
+        alignment = .centerY
+        spacing = 6
+        checkbox.font = .systemFont(ofSize: 14)
+        checkbox.state = enabled ? .on : .off
+        checkbox.target = self
+        checkbox.action = #selector(toggle)
+        field.integerValue = level
+        field.font = .systemFont(ofSize: 14)
+        field.alignment = .right
+        field.delegate = self
+        field.target = self
+        field.action = #selector(commit)
+        field.setAccessibilityLabel("Custom \(direction) percentage")
+        field.translatesAutoresizingMaskIntoConstraints = false
+        field.widthAnchor.constraint(equalToConstant: 48).isActive = true
+        let formatter = NumberFormatter()
+        formatter.allowsFloats = false
+        formatter.minimum = 1
+        formatter.maximum = 100
+        field.formatter = formatter
+        stepper.minValue = 1
+        stepper.maxValue = 100
+        stepper.integerValue = level
+        stepper.target = self
+        stepper.action = #selector(step)
+        stepper.setAccessibilityLabel("Custom \(direction) percentage")
+        let percent = NSTextField(labelWithString: "%")
+        percent.font = .systemFont(ofSize: 14)
+        [checkbox, field, stepper, percent].forEach { addArrangedSubview($0) }
+        field.isEnabled = enabled
+        stepper.isEnabled = enabled
+    }
+
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    @objc private func toggle() {
+        field.isEnabled = isEnabled
+        stepper.isEnabled = isEnabled
+        onChange?()
+    }
+
+    @objc private func commit() {
+        field.integerValue = min(max(field.integerValue, 1), 100)
+        stepper.integerValue = field.integerValue
+        onChange?()
+    }
+
+    @objc private func step() {
+        field.integerValue = stepper.integerValue
+        onChange?()
+    }
+
+    func controlTextDidEndEditing(_ notification: Notification) { commit() }
+}
+
+private final class FlippedSettingsView: NSView {
+    override var isFlipped: Bool { true }
+}
+
+@MainActor
 final class BatteryHealthCache {
     var snapshot: BatteryHealthSnapshot?
     var lastRefresh: Date?
@@ -111,6 +182,10 @@ final class SettingsWindowController:
     private let customChargingNotificationStepper = NSStepper()
     private let notificationStatusLabel =
         SettingsWindowController.makeDetailLabel("")
+    private var drainingCustomRows: [CustomBatteryAlertRow] = []
+    private var chargingCustomRows: [CustomBatteryAlertRow] = []
+    private let drainingCustomStack = NSStackView()
+    private let chargingCustomStack = NSStackView()
 
     private lazy var generalView = makeGeneralView()
     private lazy var notificationsView = makeNotificationsView()
@@ -224,7 +299,7 @@ final class SettingsWindowController:
         case .batteryHealth:
             window?.contentView = batteryHealthView
         }
-        window?.setContentSize(Self.contentSize)
+        window?.setContentSize(pane == .notifications ? NSSize(width: 560, height: 600) : Self.contentSize)
 
         switch pane {
         case .general:
@@ -340,14 +415,14 @@ final class SettingsWindowController:
     }
 
     private func makeNotificationsView() -> NSView {
-        let view = NSView()
+        let view = FlippedSettingsView()
 
         let dischargingHeading = NSTextField(
             labelWithString: "Battery Draining"
         )
         dischargingHeading.font = .systemFont(ofSize: 14, weight: .medium)
         let dischargingButtons =
-            AppPreferences.standardNotificationThresholds.map {
+            AppPreferences.dischargingNotificationPresets.map {
                 threshold -> NSButton in
                 let button = NSButton(
                     checkboxWithTitle: "\(threshold)%",
@@ -367,7 +442,7 @@ final class SettingsWindowController:
             labelWithString: "Battery Charging"
         )
         chargingHeading.font = .systemFont(ofSize: 14, weight: .medium)
-        let chargingButtons = AppPreferences.standardNotificationThresholds.map {
+        let chargingButtons = AppPreferences.chargingNotificationPresets.map {
             threshold -> NSButton in
             let button = NSButton(
                 checkboxWithTitle: "\(threshold)%",
@@ -383,30 +458,27 @@ final class SettingsWindowController:
         chargingThresholdRow.orientation = .horizontal
         chargingThresholdRow.spacing = 10
 
-        let dischargingCustomRow = makeCustomNotificationRow(
-            checkbox: customDischargingNotificationCheckbox,
-            field: customDischargingNotificationField,
-            stepper: customDischargingNotificationStepper
-        )
-        let chargingCustomRow = makeCustomNotificationRow(
-            checkbox: customChargingNotificationCheckbox,
-            field: customChargingNotificationField,
-            stepper: customChargingNotificationStepper
-        )
+        configureCustomRows(charging: false)
+        configureCustomRows(charging: true)
 
         let behaviorDetail = Self.makeDetailLabel(
-            "Draining alerts fire only as the battery level falls. Charging alerts fire only as it rises."
+            "Draining alerts notify each time the battery drops to a selected level. Charging alerts notify each time it reaches a selected level while rising."
         )
+        let testButton = NSButton(title: "Test Notification", target: self, action: #selector(testNotification))
+        let settingsButton = NSButton(title: "Open Notification Settings", target: self, action: #selector(openNotificationSettings))
+        let actions = NSStackView(views: [testButton, settingsButton])
+        actions.spacing = 8
 
         let stack = NSStackView(
             views: [
                 dischargingHeading,
                 dischargingThresholdRow,
-                dischargingCustomRow,
+                drainingCustomStack,
                 chargingHeading,
                 chargingThresholdRow,
-                chargingCustomRow,
+                chargingCustomStack,
                 behaviorDetail,
+                actions,
                 notificationStatusLabel
             ]
         )
@@ -415,23 +487,83 @@ final class SettingsWindowController:
         stack.alignment = .leading
         stack.setCustomSpacing(10, after: dischargingHeading)
         stack.setCustomSpacing(8, after: dischargingThresholdRow)
-        stack.setCustomSpacing(24, after: dischargingCustomRow)
+        stack.setCustomSpacing(24, after: drainingCustomStack)
         stack.setCustomSpacing(10, after: chargingHeading)
         stack.setCustomSpacing(8, after: chargingThresholdRow)
-        stack.setCustomSpacing(24, after: chargingCustomRow)
+        stack.setCustomSpacing(20, after: chargingCustomStack)
+        stack.setCustomSpacing(10, after: actions)
         stack.setCustomSpacing(14, after: behaviorDetail)
         view.addSubview(stack)
 
         NSLayoutConstraint.activate([
             stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48),
-            stack.trailingAnchor.constraint(
-                lessThanOrEqualTo: view.trailingAnchor,
-                constant: -48
-            ),
-            stack.topAnchor.constraint(equalTo: view.topAnchor, constant: 36)
+            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -48),
+            stack.topAnchor.constraint(equalTo: view.topAnchor, constant: 36),
+            stack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -36)
         ])
 
-        return view
+        let scroll = NSScrollView()
+        scroll.drawsBackground = false
+        scroll.hasVerticalScroller = true
+        scroll.documentView = view
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.widthAnchor.constraint(equalTo: scroll.contentView.widthAnchor).isActive = true
+        return scroll
+    }
+
+    private func configureCustomRows(charging: Bool) {
+        let stack = charging ? chargingCustomStack : drainingCustomStack
+        stack.orientation = .vertical
+        stack.alignment = .leading
+        stack.spacing = 8
+        var levels = charging ? AppPreferences.additionalChargingThresholds : AppPreferences.additionalDischargingThresholds
+        if charging, AppPreferences.customChargingNotificationEnabled {
+            levels.insert(AppPreferences.customChargingNotificationPercentage)
+        } else if !charging, AppPreferences.customDischargingNotificationEnabled {
+            levels.insert(AppPreferences.customDischargingNotificationPercentage)
+        }
+        for level in levels.sorted() { appendCustomRow(charging: charging, level: level, enabled: true) }
+        appendCustomRow(charging: charging, level: charging ? 90 : 30, enabled: false)
+    }
+
+    private func appendCustomRow(charging: Bool, level: Int, enabled: Bool) {
+        let row = CustomBatteryAlertRow(level: level, enabled: enabled, direction: charging ? "charging" : "draining")
+        row.onChange = { [weak self] in self?.saveCustomRows(charging: charging) }
+        if charging {
+            chargingCustomRows.append(row)
+            chargingCustomStack.addArrangedSubview(row)
+        } else {
+            drainingCustomRows.append(row)
+            drainingCustomStack.addArrangedSubview(row)
+        }
+    }
+
+    private func saveCustomRows(charging: Bool) {
+        let rows = charging ? chargingCustomRows : drainingCustomRows
+        let levels = Set(rows.filter(\.isEnabled).map(\.level))
+        if charging {
+            AppPreferences.additionalChargingThresholds = levels
+            AppPreferences.customChargingNotificationEnabled = false
+        } else {
+            AppPreferences.additionalDischargingThresholds = levels
+            AppPreferences.customDischargingNotificationEnabled = false
+        }
+        if rows.last?.isEnabled == true {
+            appendCustomRow(charging: charging, level: charging ? 90 : 30, enabled: false)
+        }
+        requestNotificationAuthorizationIfNeeded()
+    }
+
+    @objc private func testNotification() {
+        notificationManager.sendTestNotification { [weak self] message in
+            self?.notificationStatusLabel.stringValue = message
+        }
+    }
+
+    @objc private func openNotificationSettings() {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.Notifications-Settings.extension") {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     private func makeCustomNotificationRow(
@@ -713,7 +845,7 @@ final class SettingsWindowController:
         _ sender: NSButton
     ) {
         let threshold = sender.tag
-        guard AppPreferences.standardNotificationThresholds.contains(threshold)
+        guard AppPreferences.dischargingNotificationPresets.contains(threshold)
         else {
             return
         }
@@ -729,7 +861,7 @@ final class SettingsWindowController:
 
     @objc private func toggleChargingNotificationThreshold(_ sender: NSButton) {
         let threshold = sender.tag
-        guard AppPreferences.standardNotificationThresholds.contains(threshold)
+        guard AppPreferences.chargingNotificationPresets.contains(threshold)
         else {
             return
         }
