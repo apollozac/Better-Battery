@@ -1,4 +1,5 @@
 import AppKit
+import OSLog
 @preconcurrency import UserNotifications
 
 enum BatteryNotificationDirection: Equatable {
@@ -87,6 +88,8 @@ final class BatteryNotificationManager: NSObject,
 {
     private let center: UNUserNotificationCenter
     private var tracker = BatteryNotificationTracker()
+    private var soundsReady = false
+    private let soundLogger = Logger(subsystem: "com.local.BatteryBar", category: "NotificationSounds")
 
     init(center: UNUserNotificationCenter = .current()) {
         self.center = center
@@ -95,6 +98,20 @@ final class BatteryNotificationManager: NSObject,
 
     func start() {
         center.delegate = self
+        prepareSounds()
+    }
+
+    @discardableResult
+    private func prepareSounds() -> Bool {
+        if soundsReady { return true }
+        do {
+            let writes = try BatteryNotificationSound.installBundledSounds()
+            soundsReady = true
+            soundLogger.info("Notification sounds prepared; files installed: \(writes)")
+        } catch {
+            soundLogger.error("Could not prepare notification sounds: \(error.localizedDescription, privacy: .private)")
+        }
+        return soundsReady
     }
 
     func process(snapshot: BatterySnapshot) {
@@ -138,10 +155,13 @@ final class BatteryNotificationManager: NSObject,
             let content = UNMutableNotificationContent()
             content.title = "Better Battery Test"
             content.body = "This is the \(sound.displayName) sound. Your selected battery levels will notify you here."
+            let soundsReady = self.prepareSounds()
             content.sound = sound.sound
-            self.center.add(UNNotificationRequest(identifier: "battery-test", content: content, trigger: nil)) { error in
+            self.center.add(UNNotificationRequest(identifier: "battery-test-\(sound.notificationFilename)", content: content, trigger: nil)) { error in
                 let message = error.map { "Could not send notification: \($0.localizedDescription)" }
-                    ?? "\(sound.displayName) test sent. Banner visibility and sound follow your macOS notification and Focus settings."
+                    ?? (soundsReady
+                        ? "\(sound.displayName) test sent. Banner visibility and sound follow your macOS notification and Focus settings."
+                        : "Test sent, but custom sound setup failed. macOS may use its default tone.")
                 DispatchQueue.main.async { completion(message) }
             }
         }
@@ -158,6 +178,7 @@ final class BatteryNotificationManager: NSObject,
     }
 
     private func deliver(_ event: BatteryNotificationEvent) {
+        prepareSounds()
         let content = UNMutableNotificationContent()
         content.title = BatteryNotificationPolicy.title(for: event)
         content.body = BatteryNotificationPolicy.body(for: event)

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.3
+
+- Fixes notification sounds falling back to the macOS default tone.
+- Installs the distinct L1 low-battery, charge-target, and full-charge tones
+  before notification delivery while respecting macOS notification and Focus
+  settings.
+
 ## 1.7.0
 
 - Adds configurable battery notifications with independent presets and custom

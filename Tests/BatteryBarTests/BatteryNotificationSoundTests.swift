@@ -4,6 +4,52 @@ import XCTest
 @testable import BatteryBar
 
 final class BatteryNotificationSoundTests: XCTestCase {
+    func testInstallationPreservesRecordingsAndSkipsUnchangedFiles() throws {
+        let destination = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: destination) }
+        let source = resourceURL(for: .low).deletingLastPathComponent()
+        XCTAssertEqual(try BatteryNotificationSound.install(from: source, to: destination), 3)
+        var dates: [URL: Date] = [:]
+        for sound in BatteryNotificationSound.allCases {
+            let url = destination.appendingPathComponent(sound.notificationFilename)
+            XCTAssertNotEqual(sound.notificationFilename, sound.rawValue)
+            XCTAssertEqual(try Data(contentsOf: url), try Data(contentsOf: resourceURL(for: sound)))
+            dates[url] = try url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
+        }
+        XCTAssertEqual(Set(BatteryNotificationSound.allCases.map(\.notificationFilename)).count, 3)
+        XCTAssertEqual(try BatteryNotificationSound.install(from: source, to: destination), 0)
+        for (url, date) in dates {
+            XCTAssertEqual(try url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate, date)
+        }
+        let unrelated = destination.appendingPathComponent("another-app.wav")
+        try Data([1, 2, 3]).write(to: unrelated)
+        try Data([0]).write(to: destination.appendingPathComponent(BatteryNotificationSound.low.notificationFilename))
+        XCTAssertEqual(try BatteryNotificationSound.install(from: source, to: destination), 1)
+        XCTAssertEqual(try Data(contentsOf: unrelated), Data([1, 2, 3]))
+        XCTAssertEqual(
+            try Data(contentsOf: destination.appendingPathComponent(BatteryNotificationSound.low.notificationFilename)),
+            try Data(contentsOf: resourceURL(for: .low))
+        )
+    }
+
+    func testMissingSourceDoesNotCreateSoundDirectory() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let destination = root.appendingPathComponent("Sounds")
+        XCTAssertThrowsError(try BatteryNotificationSound.install(from: root, to: destination))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: destination.path))
+    }
+
+    func testInvalidDestinationReportsInstallationFailure() throws {
+        let destination = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: destination) }
+        try Data([1]).write(to: destination)
+        XCTAssertThrowsError(try BatteryNotificationSound.install(
+            from: resourceURL(for: .low).deletingLastPathComponent(), to: destination
+        ))
+        XCTAssertEqual(try Data(contentsOf: destination), Data([1]))
+    }
+
     func testSoundNamesAndFiles() {
         XCTAssertEqual(BatteryNotificationSound.allCases, [.low, .target, .full])
         XCTAssertEqual(BatteryNotificationSound.low.displayName, "Low Battery")
