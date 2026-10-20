@@ -462,9 +462,21 @@ final class SettingsWindowController:
         configureCustomRows(charging: true)
 
         let behaviorDetail = Self.makeDetailLabel(
-            "Draining alerts notify each time the battery drops to a selected level. Charging alerts notify each time it reaches a selected level while rising."
+            "Draining alerts notify each time the battery drops to a selected level. Charging alerts notify each time it reaches a selected level while rising. Distinct sounds identify low battery, charge targets, and full charge. Sound follows your macOS notification settings."
         )
-        let testButton = NSButton(title: "Test Notification", target: self, action: #selector(testNotification))
+        let testButton = NSPopUpButton(frame: .zero, pullsDown: true)
+        testButton.addItem(withTitle: "Test Notification")
+        for sound in BatteryNotificationSound.allCases {
+            let item = NSMenuItem(
+                title: sound.displayName,
+                action: #selector(testNotification(_:)),
+                keyEquivalent: ""
+            )
+            item.target = self
+            item.representedObject = sound.rawValue
+            testButton.menu?.addItem(item)
+        }
+        testButton.setAccessibilityLabel("Test notification sound")
         let settingsButton = NSButton(title: "Open Notification Settings", target: self, action: #selector(openNotificationSettings))
         let actions = NSStackView(views: [testButton, settingsButton])
         actions.spacing = 8
@@ -554,8 +566,10 @@ final class SettingsWindowController:
         requestNotificationAuthorizationIfNeeded()
     }
 
-    @objc private func testNotification() {
-        notificationManager.sendTestNotification { [weak self] message in
+    @objc private func testNotification(_ sender: NSMenuItem) {
+        guard let filename = sender.representedObject as? String,
+              let sound = BatteryNotificationSound(rawValue: filename) else { return }
+        notificationManager.sendTestNotification(sound: sound) { [weak self] message in
             self?.notificationStatusLabel.stringValue = message
         }
     }

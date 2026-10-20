@@ -28,6 +28,8 @@ signed and notarized by Apple.
 - Displays battery condition, maximum capacity, and cycle count in Settings.
 - Offers independent charging and draining alerts at preset or custom battery
   levels.
+- Uses distinct original tones for low battery, charge targets, and full charge,
+  with previews in Notifications settings.
 - Can open automatically when you log in.
 - Checks for signed updates and can install them automatically.
 - Uses native macOS power notifications with a low-frequency safety refresh.

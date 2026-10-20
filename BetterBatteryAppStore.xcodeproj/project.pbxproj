@@ -21,6 +21,10 @@
 		A1000000000000000000000D /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000F /* IOKit.framework */; };
 		A1000000000000000000000E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20000000000000000000010 /* ServiceManagement.framework */; };
 		A1000000000000000000000F /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20000000000000000000011 /* UserNotifications.framework */; };
+		A10000000000000000000010 /* BatteryNotificationSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000013 /* BatteryNotificationSound.swift */; };
+		A10000000000000000000011 /* BetterBattery-Low.wav in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000014 /* BetterBattery-Low.wav */; };
+		A10000000000000000000012 /* BetterBattery-Target.wav in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000015 /* BetterBattery-Target.wav */; };
+		A10000000000000000000013 /* BetterBattery-Full.wav in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000016 /* BetterBattery-Full.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +46,10 @@
 		A20000000000000000000010 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		A20000000000000000000011 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		A20000000000000000000012 /* Better Battery.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Better Battery.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000000000000000000013 /* BatteryNotificationSound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryNotificationSound.swift; sourceTree = "<group>"; };
+		A20000000000000000000014 /* BetterBattery-Low.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "BetterBattery-Low.wav"; sourceTree = "<group>"; };
+		A20000000000000000000015 /* BetterBattery-Target.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "BetterBattery-Target.wav"; sourceTree = "<group>"; };
+		A20000000000000000000016 /* BetterBattery-Full.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "BetterBattery-Full.wav"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +72,7 @@
 			children = (
 				A40000000000000000000002 /* Sources */,
 				A40000000000000000000003 /* AppStore */,
+				A40000000000000000000006 /* Sounds */,
 				A40000000000000000000004 /* Frameworks */,
 				A40000000000000000000005 /* Products */,
 			);
@@ -76,6 +85,7 @@
 				A20000000000000000000002 /* BatteryHealthReader.swift */,
 				A20000000000000000000003 /* BatteryIconRenderer.swift */,
 				A20000000000000000000004 /* BatteryNotificationManager.swift */,
+				A20000000000000000000013 /* BatteryNotificationSound.swift */,
 				A20000000000000000000005 /* BatteryReader.swift */,
 				A20000000000000000000006 /* BatterySnapshot.swift */,
 				A20000000000000000000007 /* BatteryStatusController.swift */,
@@ -112,6 +122,17 @@
 			isa = PBXGroup;
 			children = (A20000000000000000000012 /* Better Battery.app */,);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000006 /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000014 /* BetterBattery-Low.wav */,
+				A20000000000000000000015 /* BetterBattery-Target.wav */,
+				A20000000000000000000016 /* BetterBattery-Full.wav */,
+			);
+			name = Sounds;
+			path = Resources/Sounds;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -161,7 +182,12 @@
 		A30000000000000000000003 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
-			files = (A1000000000000000000000B /* PrivacyInfo.xcprivacy in Resources */,);
+			files = (
+				A1000000000000000000000B /* PrivacyInfo.xcprivacy in Resources */,
+				A10000000000000000000011 /* BetterBattery-Low.wav in Resources */,
+				A10000000000000000000012 /* BetterBattery-Target.wav in Resources */,
+				A10000000000000000000013 /* BetterBattery-Full.wav in Resources */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
@@ -190,6 +216,7 @@
 				A10000000000000000000002 /* BatteryHealthReader.swift in Sources */,
 				A10000000000000000000003 /* BatteryIconRenderer.swift in Sources */,
 				A10000000000000000000004 /* BatteryNotificationManager.swift in Sources */,
+				A10000000000000000000010 /* BatteryNotificationSound.swift in Sources */,
 				A10000000000000000000005 /* BatteryReader.swift in Sources */,
 				A10000000000000000000006 /* BatterySnapshot.swift in Sources */,
 				A10000000000000000000007 /* BatteryStatusController.swift in Sources */,

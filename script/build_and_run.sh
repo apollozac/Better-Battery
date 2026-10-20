@@ -36,6 +36,7 @@ ditto \
     "$APP_FRAMEWORKS/Sparkle.framework"
 cp "$ROOT_DIR/Resources/Info.plist" "$APP_CONTENTS/Info.plist"
 "$ROOT_DIR/script/compile_app_icon.sh" "$APP_RESOURCES" "$BUNDLE_ID"
+bash "$ROOT_DIR/script/stage_notification_sounds.sh" "$APP_RESOURCES"
 chmod +x "$APP_BINARY"
 xattr -cr "$APP_BUNDLE"
 codesign --force --deep --sign - "$APP_FRAMEWORKS/Sparkle.framework" >/dev/null

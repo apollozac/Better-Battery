@@ -1,0 +1,29 @@
+{
+  "set": "L1 · Precision",
+  "provenance": "Original synthesized notification tones. No Apple sound recordings, samples, or melodies.",
+  "source_script": "script/render_notification_finalists.py",
+  "selection": "User-approved L1 finalist, preserved without audio changes.",
+  "format": {
+    "encoding": "PCM",
+    "channels": 1,
+    "sample_rate": 48000,
+    "bits_per_sample": 16
+  },
+  "sounds": [
+    {
+      "file": "BetterBattery-Low.wav",
+      "source": "outputs/sound-studies/five-options/finalists/l1-low.wav",
+      "sha256": "7e27ee63d13439d0e518939104b124fd0a8ac6e50b76258c85d9bd6178efc1b9"
+    },
+    {
+      "file": "BetterBattery-Target.wav",
+      "source": "outputs/sound-studies/five-options/finalists/l1-target.wav",
+      "sha256": "e7a9eebd371b7fc54128880de6ca68a2923e76486dc5cda8fc3f610c067bde6c"
+    },
+    {
+      "file": "BetterBattery-Full.wav",
+      "source": "outputs/sound-studies/five-options/finalists/l1-full.wav",
+      "sha256": "ea62c7ace6119936eb56a8cf744f9e33d50942ce14802538869c50421b859cf4"
+    }
+  ]
+}

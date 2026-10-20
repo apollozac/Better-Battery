@@ -126,7 +126,10 @@ final class BatteryNotificationManager: NSObject,
         }
     }
 
-    func sendTestNotification(completion: @escaping (String) -> Void) {
+    func sendTestNotification(
+        sound: BatteryNotificationSound = .target,
+        completion: @escaping (String) -> Void
+    ) {
         requestAuthorization { [weak self] granted in
             guard granted, let self else {
                 completion("Allow notifications in System Settings, then try again.")
@@ -134,11 +137,11 @@ final class BatteryNotificationManager: NSObject,
             }
             let content = UNMutableNotificationContent()
             content.title = "Better Battery Test"
-            content.body = "Battery alerts are ready. Your selected levels will notify you here."
-            content.sound = .default
+            content.body = "This is the \(sound.displayName) sound. Your selected battery levels will notify you here."
+            content.sound = sound.sound
             self.center.add(UNNotificationRequest(identifier: "battery-test", content: content, trigger: nil)) { error in
                 let message = error.map { "Could not send notification: \($0.localizedDescription)" }
-                    ?? "Test sent. Banner visibility and sound follow your macOS notification and Focus settings."
+                    ?? "\(sound.displayName) test sent. Banner visibility and sound follow your macOS notification and Focus settings."
                 DispatchQueue.main.async { completion(message) }
             }
         }
@@ -158,7 +161,7 @@ final class BatteryNotificationManager: NSObject,
         let content = UNMutableNotificationContent()
         content.title = BatteryNotificationPolicy.title(for: event)
         content.body = BatteryNotificationPolicy.body(for: event)
-        content.sound = .default
+        content.sound = BatteryNotificationSound.selection(for: event).sound
 
         let direction = event.direction == .charging ? "charging" : "discharging"
         let request = UNNotificationRequest(
